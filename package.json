@@ -1,0 +1,25 @@
+{
+  "name": "vision-v3-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Vision v3.0 real-time geospatial command center monorepo",
+  "workspaces": [
+    "apps/web-command",
+    "packages/shared-types",
+    "packages/config"
+  ],
+  "scripts": {
+    "dev": "bash ./scripts/dev-stack.sh",
+    "dev:web": "npm run dev --workspace apps/web-command",
+    "dev:api-gateway": "mvn -f apps/pom.xml -pl api-gateway spring-boot:run",
+    "dev:geospatial": "mvn -f apps/pom.xml -pl geospatial-service spring-boot:run",
+    "dev:ingestion": "mvn -f apps/pom.xml -pl data-ingestion spring-boot:run",
+    "build:web": "npm run build --workspace apps/web-command",
+    "test:web": "npm run test --workspace apps/web-command",
+    "test:web:e2e": "npm run test:e2e --workspace apps/web-command",
+    "check:web": "npm run lint --workspace apps/web-command && npm run typecheck --workspace apps/web-command"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

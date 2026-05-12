@@ -1,0 +1,900 @@
+    letter-spacing: 0.1em;
+    color: rgba(227, 239, 255, 0.96);
+    font-family: "Orbitron", monospace;
+}
+
+.focus-aircraft header span {
+    flex: 0 0 auto;
+    font-size: 8px;
+    letter-spacing: 0.14em;
+    color: rgba(101, 216, 255, 0.9);
+}
+
+.focus-aircraft-row {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 2px);
+    margin: 0;
+    padding: 2px 3px;
+    border-top: 1px solid rgba(120, 132, 160, 0.22);
+    border-radius: 5px;
+    font-size: 8px;
+    letter-spacing: 0.055em;
+    color: rgba(195, 205, 226, 0.86);
+    background: rgba(255, 255, 255, 0.018);
+}
+
+.focus-aircraft-row span {
+    flex: 0 0 auto;
+    color: rgba(172, 183, 209, 0.7);
+}
+
+.focus-aircraft-row strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
+    color: rgba(236, 244, 255, 0.98);
+    font-weight: 500;
+    max-width: 124px;
+}
+
+.focus-aircraft-row:nth-of-type(2),
+.focus-aircraft-row:nth-of-type(3) {
+    width: calc(100% - 3px);
+}
+
+#focusCardRegistration,
+#focusCardType {
+    max-width: 124px;
+}
+
+#focusCardAltitude,
+#focusCardSpeed,
+#focusCardHeading {
+    color: var(--cyan);
+}
+
+.focus-aircraft-foot {
+    margin: 5px 0 0;
+    padding-top: 3px;
+    border-top: 1px solid rgba(120, 132, 160, 0.22);
+    font-size: 8px;
+    letter-spacing: 0.07em;
+    color: rgba(153, 174, 208, 0.74);
+    text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.flight-info-panel {
+    position: absolute;
+    right: 24px;
+    top: calc(var(--top-h) + 16px);
+    width: 320px;
+    border-radius: 14px;
+    padding: 12px;
+    z-index: 20;
+    pointer-events: auto;
+    background: linear-gradient(165deg, rgba(0, 0, 0, 0.88), rgba(2, 6, 12, 0.94));
+    border: 1px solid color-mix(in srgb, var(--cyan) 40%, rgba(120, 132, 160, 0.2));
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(38, 201, 255, 0.1);
+    font-family: "Share Tech Mono", monospace;
+}
+
+.flight-info-panel.hidden {
+    display: none;
+}
+
+.flight-info-header {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(120, 132, 160, 0.25);
+}
+
+.flight-info-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.flight-info-header h4 {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    color: var(--cyan);
+    font-family: "Orbitron", monospace;
+    text-shadow: 0 0 12px color-mix(in srgb, var(--cyan) 50%, transparent);
+}
+
+.flight-info-close {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(120, 132, 160, 0.3);
+    border-radius: 6px;
+    color: rgba(220, 230, 250, 0.8);
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 7px;
+    cursor: pointer;
+}
+
+.flight-info-close:hover {
+    background: rgba(255, 60, 100, 0.2);
+    border-color: rgba(255, 60, 100, 0.5);
+}
+
+.flight-info-mode {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: rgba(220, 230, 250, 0.6);
+    text-transform: uppercase;
+}
+
+.flight-info-grid {
+    display: grid;
+    gap: 4px;
+}
+
+.flight-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(120, 132, 160, 0.15);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+}
+
+.flight-info-label {
+    color: rgba(172, 183, 209, 0.7);
+    text-transform: uppercase;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+}
+
+.flight-info-value {
+    color: rgba(236, 244, 255, 0.95);
+    font-weight: 500;
+    text-align: right;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#flightInfoAlt,
+#flightInfoSpeed,
+#flightInfoHdg {
+    color: var(--cyan);
+}
+
+.flight-info-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(120, 132, 160, 0.25);
+}
+
+.flight-info-action-btn {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid color-mix(in srgb, var(--cyan) 30%, rgba(120, 132, 160, 0.25));
+    border-radius: 8px;
+    color: var(--cyan);
+    font-family: "Orbitron", monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.flight-info-action-btn:hover {
+    background: color-mix(in srgb, var(--cyan) 15%, rgba(0, 0, 0, 0.6));
+    border-color: color-mix(in srgb, var(--cyan) 50%, rgba(120, 132, 160, 0.3));
+}
+
+.config-pop {
+    position: absolute;
+    top: calc(var(--top-h) + 30px);
+    left: calc(var(--rail-w) + 26px);
+    width: min(380px, calc(100vw - (var(--rail-w) * 2) - 80px));
+    border-radius: 12px;
+    padding: 10px;
+    z-index: 18;
+}
+
+.profile-settings {
+    position: absolute;
+    top: calc(var(--top-h) + 30px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(780px, calc(100vw - 54px));
+    max-height: calc(100vh - 140px);
+    z-index: 15;
+    border-radius: 12px;
+    padding: 12px;
+    display: grid;
+    gap: 9px;
+    overflow: hidden auto;
+}
+
+.profile-settings.hidden {
+    display: none;
+}
+
+.profile-settings > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.profile-settings h4 {
+    margin: 0;
+    color: rgba(205, 213, 234, 0.78);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.profile-settings-note {
+    margin: 0;
+    font-size: 10px;
+    color: rgba(178, 190, 214, 0.8);
+    line-height: 1.35;
+}
+
+.profile-settings-note-passive {
+    color: rgba(167, 186, 214, 0.86);
+}
+
+.profile-settings-tabs {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.profile-settings-tab-btn {
+    min-height: 30px;
+    padding: 6px 10px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+}
+
+.profile-settings-tab-panel {
+    display: grid;
+    gap: 8px;
+}
+
+.profile-settings-tab-panel.hidden {
+    display: none;
+}
+
+.profile-settings-count {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.3;
+    color: rgba(172, 186, 212, 0.86);
+    letter-spacing: 0.07em;
+}
+
+.profile-settings-api {
+    border: 1px solid rgba(121, 133, 161, 0.24);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.54);
+    padding: 8px;
+    display: grid;
+    gap: 8px;
+}
+
+.profile-settings-api-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.profile-settings-api-header h5 {
+    margin: 0;
+    font-family: "Orbitron", monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(218, 231, 250, 0.94);
+}
+
+.profile-api-refresh-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+}
+
+.profile-settings-api-list {
+    display: grid;
+    gap: 6px;
+    max-height: min(30vh, 230px);
+    overflow: auto;
+    padding-right: 3px;
+}
+
+.profile-api-item {
+    border: 1px solid rgba(121, 133, 161, 0.2);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.48);
+    padding: 6px 8px;
+    display: grid;
+    gap: 3px;
+}
+
+.profile-api-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.profile-api-item-label {
+    color: rgba(222, 233, 249, 0.94);
+    font-size: 10px;
+    line-height: 1.25;
+    letter-spacing: 0.05em;
+}
+
+.profile-api-item-meta {
+    color: rgba(159, 176, 206, 0.78);
+    font-size: 9px;
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+}
+
+.profile-api-empty {
+    margin: 0;
+    color: rgba(172, 186, 212, 0.84);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+}
+
+.profile-settings-grid {
+    display: grid;
+    gap: 10px;
+    max-height: min(46vh, 420px);
+    overflow: auto;
+    padding-right: 4px;
+}
+
+.profile-settings-grid::-webkit-scrollbar {
+    width: 10px;
+}
+
+.profile-settings-grid::-webkit-scrollbar-track {
+    background: rgba(18, 24, 40, 0.58);
+    border-radius: 999px;
+}
+
+.profile-settings-grid::-webkit-scrollbar-thumb {
+    background: rgba(96, 150, 216, 0.62);
+    border-radius: 999px;
+    border: 2px solid rgba(18, 24, 40, 0.58);
+}
+
+.profile-settings-group {
+    border: 1px solid rgba(121, 133, 161, 0.24);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.54);
+    padding: 8px;
+    display: grid;
+    gap: 8px;
+}
+
+.profile-settings-group-title {
+    margin: 0;
+    font-family: "Orbitron", monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(218, 231, 250, 0.94);
+}
+
+.profile-settings-items {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+}
+
+.profile-settings-item {
+    border: 1px solid rgba(121, 133, 161, 0.2);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.48);
+    padding: 6px 8px;
+    display: grid;
+    gap: 3px;
+}
+
+.profile-settings-item.changed {
+    border-color: rgba(38, 201, 255, 0.45);
+    box-shadow: inset 0 0 0 1px rgba(38, 201, 255, 0.15);
+}
+
+.profile-settings-item-label {
+    color: rgba(222, 233, 249, 0.94);
+    font-size: 10px;
+    line-height: 1.25;
+    letter-spacing: 0.05em;
+}
+
+.profile-settings-item-meta {
+    color: rgba(159, 176, 206, 0.72);
+    font-size: 9px;
+    line-height: 1.2;
+}
+
+.profile-settings-item-control {
+    justify-self: end;
+}
+
+.profile-settings label {
+    display: grid;
+    gap: 4px;
+    color: rgba(196, 205, 225, 0.86);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.profile-settings input {
+    width: 100%;
+    border: 1px solid rgba(121, 133, 161, 0.3);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.72);
+    color: rgba(229, 236, 251, 0.92);
+    font-family: "Share Tech Mono", monospace;
+    font-size: 12px;
+    padding: 8px;
+}
+
+.config-pop.hidden {
+    display: none;
+}
+
+.config-pop header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.config-pop h4 {
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: rgba(211, 221, 243, 0.8);
+}
+
+.cfg-content {
+    display: grid;
+    gap: 10px;
+}
+
+.cfg-content label {
+    display: grid;
+    gap: 6px;
+    color: rgba(196, 205, 225, 0.76);
+    font-size: 11px;
+}
+
+.cfg-content select {
+    border: 1px solid rgba(121, 133, 161, 0.3);
+    background: rgba(0, 0, 0, 0.82);
+    color: rgba(229, 236, 251, 0.92);
+    border-radius: 8px;
+    padding: 7px;
+    font-family: "Share Tech Mono", monospace;
+}
+
+.cfg-content .inline-check {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px;
+}
+
+.cfg-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cfg-note {
+    margin: 0;
+    font-size: 10px;
+    color: rgba(171, 184, 214, 0.68);
+    letter-spacing: 0.06em;
+}
+
+.cfg-content input[type="color"] {
+    width: 100%;
+    min-height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--ui-border);
+    background: var(--ui-btn-bg);
+    padding: 2px;
+    cursor: pointer;
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--cyan);
+}
+
+/* Accent-driven highlight theming */
+.app-stamp,
+.style-wrap strong,
+.layers-panel-badge,
+.control-card .row,
+.focus-aircraft header span,
+.count,
+.info-banner,
+.rec-block {
+    color: var(--cyan);
+}
+
+.toggle.on,
+.chip.active,
+.style-btn.active,
+.variant-chip.active,
+.focus-mode-btn.active {
+    color: var(--cyan);
+    border-color: var(--ui-accent-soft);
+    box-shadow: inset 0 0 0 1px var(--ui-accent-faint), 0 0 10px var(--ui-accent-glow);
+}
+
+.accent-presets {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.accent-presets .chip {
+    min-width: 0;
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 10px;
+    text-align: center;
+}
+
+.accent-presets .chip.active {
+    border-color: var(--ui-accent-soft);
+    box-shadow: inset 0 0 0 1px var(--ui-accent-faint), 0 0 10px var(--ui-accent-glow);
+}
+
+.world-texture-card {
+    margin-top: auto;
+}
+
+.world-texture-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.world-texture-grid .chip {
+    min-width: 0;
+    width: 100%;
+    padding: 5px 6px;
+    font-size: 9px;
+    text-align: center;
+    letter-spacing: 0.06em;
+}
+
+.world-texture-grid .chip.active {
+    color: var(--cyan);
+    border-color: var(--ui-accent-soft);
+    box-shadow: inset 0 0 0 1px var(--ui-accent-faint), 0 0 10px var(--ui-accent-glow);
+}
+
+body.clean-ui .pixel-noise,
+body.clean-ui .scanlines,
+body.clean-ui .reticle {
+    display: none;
+}
+
+body.map-fullscreen #frame {
+    border: 0;
+    border-radius: 0;
+}
+
+body.map-fullscreen .hud-top,
+body.map-fullscreen .left-rail,
+body.map-fullscreen .right-rail,
+body.map-fullscreen .focus-aircraft,
+body.map-fullscreen .config-pop,
+body.map-fullscreen .reticle,
+body.map-fullscreen .pixel-noise,
+body.map-fullscreen .scanlines,
+body.map-fullscreen .vignette,
+body.map-fullscreen .spotlight-mask,
+body.map-fullscreen .map-fullscreen-btn {
+    display: none !important;
+}
+
+body.map-fullscreen.map-fullscreen-hide-dock .bottom-dock {
+    display: none !important;
+}
+
+body.focus-data-active .bottom-dock {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+
+body.focus-data-active .focus-aircraft {
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 10px !important;
+    transform: translateX(-50%) !important;
+    width: min(220px, calc(100vw - (var(--rail-w) * 2) - 54px));
+    max-width: calc(100vw - 48px);
+    display: block;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.62), 0 0 24px rgba(38, 201, 255, 0.1);
+}
+
+body.focus-data-active .focus-aircraft.hidden {
+    display: none;
+}
+
+body.layout-recon {
+    --rail-w: 292px;
+}
+
+body.layout-operator {
+    --rail-w: 350px;
+}
+
+.vision-boot {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #000;
+    color: #54ff8f;
+    pointer-events: none;
+    animation: visionBootFade 700ms cubic-bezier(0.2, 0.75, 0.2, 1) 3.72s both;
+}
+
+.vision-boot::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 46%, rgba(58, 255, 132, 0.13), transparent 29%),
+        linear-gradient(rgba(84, 255, 143, 0.035) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 5px;
+    opacity: 0.9;
+}
+
+.vision-boot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, transparent, rgba(84, 255, 143, 0.16), transparent),
+        radial-gradient(circle at 50% 50%, transparent 0 22%, rgba(0, 0, 0, 0.72) 70%);
+    transform: translateX(-115%);
+    animation: visionBootScan 1.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.25s both;
+}
+
+.vision-boot-code {
+    position: relative;
+    z-index: 2;
+    width: min(430px, 78vw);
+    min-height: 132px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(84, 255, 143, 0.2);
+    background: linear-gradient(180deg, rgba(0, 12, 4, 0.92), rgba(0, 0, 0, 0.86));
+    box-shadow:
+        inset 0 0 0 1px rgba(84, 255, 143, 0.055),
+        0 0 34px rgba(84, 255, 143, 0.08);
+    font-family: "Share Tech Mono", monospace;
+    font-size: clamp(11px, 1.4vw, 14px);
+    letter-spacing: 0.045em;
+    color: rgba(130, 255, 167, 0.82);
+    overflow: hidden;
+    animation: visionCodePanel 3.55s ease both;
+}
+
+.vision-boot-code::before {
+    content: "VISION://BOOT";
+    display: block;
+    margin-bottom: 12px;
+    color: rgba(224, 255, 232, 0.42);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+}
+
+.vision-boot-code span {
+    display: block;
+    width: 0;
+    max-width: max-content;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 5px 0;
+    border-right: 1px solid rgba(84, 255, 143, 0.74);
+    animation: visionCodeType 520ms steps(32, end) both;
+}
+
+.vision-boot-code span:nth-child(1) {
+    animation-delay: 0.12s;
+}
+
+.vision-boot-code span:nth-child(2) {
+    animation-delay: 0.48s;
+}
+
+.vision-boot-code span:nth-child(3) {
+    animation-delay: 0.84s;
+}
+
+.vision-boot-code span:nth-child(4) {
+    animation-delay: 1.2s;
+}
+
+.vision-boot-code span:nth-child(5) {
+    animation-delay: 1.56s;
+}
+
+.vision-boot-word {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    top: 50%;
+    font-family: "Orbitron", sans-serif;
+    font-size: clamp(42px, 7.2vw, 96px);
+    font-weight: 800;
+    letter-spacing: 0.24em;
+    color: #54ff8f;
+    text-shadow:
+        0 0 12px rgba(84, 255, 143, 0.62),
+        0 0 38px rgba(84, 255, 143, 0.24);
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    animation: visionBootWord 1.7s cubic-bezier(0.2, 0.85, 0.2, 1) 2.1s both;
+}
+
+.vision-boot-word::before,
+.vision-boot-word::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    color: #54ff8f;
+    opacity: 0;
+    text-shadow:
+        0 0 10px rgba(84, 255, 143, 0.46),
+        0 0 26px rgba(84, 255, 143, 0.22);
+    clip-path: inset(0 0 0 0);
+    pointer-events: none;
+}
+
+.vision-boot-word::before {
+    animation: visionBootPixelGlitch 620ms steps(1, end) 2.66s 2;
+}
+
+.vision-boot-word::after {
+    animation: visionBootPixelGlitch 520ms steps(1, end) 2.72s 2 reverse;
+}
+
+.vision-boot-sub {
+    position: absolute;
+    z-index: 3;
+    top: calc(50% + 78px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Share Tech Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: rgba(157, 255, 184, 0.58);
+    opacity: 0;
+    animation: visionBootSub 1.3s ease 2.3s both;
+}
+
+body.boot-complete .vision-boot {
+    display: none;
+}
+
+@keyframes visionBootFade {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+@keyframes visionBootScan {
+    0% {
+        transform: translateX(-115%);
+    }
+    100% {
+        transform: translateX(115%);
+    }
+}
+
+@keyframes visionCodeType {
+    0% {
+        width: 0;
+        opacity: 0.2;
+    }
+    100% {
+        width: 100%;
+        opacity: 1;
+    }
+}
+
+@keyframes visionCodePanel {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+        filter: blur(3px);
+    }
+    12%, 58% {
+        opacity: 1;
+        transform: none;
+        filter: none;
+    }
+    76%, 100% {
+        opacity: 0;
+        transform: translateY(-5px) scale(0.99);
+        filter: blur(5px);
+    }
+}
+
+@keyframes visionBootWord {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.96);
+        filter: blur(8px);
+    }
+    18%, 52% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(0);
+    }
+    62% {
+        transform: translate(-50%, -50%) scale(1.012);
+        filter: contrast(1.35) brightness(1.08);
+        text-shadow:
+            0 0 4px rgba(84, 255, 143, 0.9),
+            0 0 24px rgba(84, 255, 143, 0.28);
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(0.996);
+        filter: contrast(1.18);
+    }
+    82%, 100% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+        filter: none;
+    }
+}
+
+@keyframes visionBootSub {
+    0%, 35% {
+        opacity: 0;
+        transform: translate(-50%, 5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+

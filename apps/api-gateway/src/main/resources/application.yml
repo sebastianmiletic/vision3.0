@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+vision:
+  geospatial:
+    base-url: ${VISION_GEOSPATIAL_BASE_URL:http://localhost:8082}
+
+logging:
+  level:
+    root: INFO
+    com.deltalabs.vision: DEBUG

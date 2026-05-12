@@ -1,0 +1,650 @@
+:root {
+    --text: #d8e7ff;
+    --muted: rgba(191, 201, 224, 0.62);
+    --cyan: #26c9ff;
+    --green: #22dd7f;
+    --amber: #d99a43;
+    --danger: #ff3e63;
+
+    --panel-bg: rgba(0, 0, 0, 0.56);
+    --panel-bg-2: rgba(2, 4, 8, 0.6);
+    --panel-border: rgba(124, 137, 167, 0.24);
+    --ui-surface-a: rgba(0, 0, 0, 0.56);
+    --ui-surface-b: rgba(2, 4, 8, 0.66);
+    --ui-surface-c: rgba(8, 14, 24, 0.78);
+    --ui-border-soft: rgba(124, 137, 167, 0.26);
+    --ui-border: rgba(124, 137, 167, 0.38);
+    --ui-border-strong: rgba(124, 137, 167, 0.62);
+    --ui-text-strong: rgba(224, 234, 252, 0.96);
+    --ui-text: rgba(205, 215, 237, 0.9);
+    --ui-text-muted: rgba(176, 188, 216, 0.76);
+    --ui-accent-soft: rgba(38, 201, 255, 0.76);
+    --ui-accent-faint: rgba(38, 201, 255, 0.34);
+    --ui-accent-glow: rgba(38, 201, 255, 0.2);
+    --ui-btn-bg: rgba(0, 0, 0, 0.74);
+    --bg-1: #0f1118;
+    --bg-2: #05070b;
+    --bg-3: #000001;
+    --frame-border: rgba(140, 147, 167, 0.24);
+
+    --pix: 0;
+    --dist: 0;
+    --inst: 0;
+    --scene-blur: 0;
+    --noise: 0;
+    --sh-normal: 0;
+    --sh-crt: 0;
+    --sh-nvg: 0;
+    --sh-noir: 0;
+    --sh-ultra: 0;
+    --sh-spotlight: 0;
+    --sh-custom: 0;
+    --crt-strength: 0.7;
+    --crt-scanline-strength: 0.7;
+    --crt-noise-strength: 0.5;
+    --crt-jitter-strength: 0.45;
+    --spotlight-strength: 1;
+
+    --top-h: 94px;
+    --dock-h: 74px;
+    --dock-control-h: 42px;
+    --rail-w: 320px;
+    --spotlight-radius: clamp(250px, 24vw, 430px);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 36%, var(--bg-1) 0%, var(--bg-2) 38%, var(--bg-3) 74%);
+    color: var(--text);
+    font-family: "Share Tech Mono", monospace;
+}
+
+#frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--frame-border);
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+#cesiumContainer canvas {
+    pointer-events: auto !important;
+    touch-action: pan pinch;
+    cursor: default;
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#cesiumContainer .cesium-widget canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#cesiumContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    pointer-events: auto;
+    touch-action: pan pinch;
+    cursor: default;
+    z-index: 1;
+    filter:
+        grayscale(calc(var(--sh-noir) + var(--sh-nvg)))
+        sepia(calc(var(--sh-nvg)))
+        hue-rotate(calc((var(--sh-nvg) * 64deg) + (var(--sh-custom) * 3deg)))
+        saturate(calc(1.06 + var(--sh-nvg) * 2.2 + var(--sh-ultra) * 0.3 + var(--sh-spotlight) * 0.02 + var(--sh-custom) * 0.22 + var(--pix) * 0.03))
+        contrast(calc(1.04 + var(--sh-nvg) * 0.14 + var(--sh-noir) * 0.3 + var(--sh-ultra) * 0.18 + var(--sh-spotlight) * 0.12 + var(--sh-custom) * 0.2 + var(--pix) * 0.03))
+        brightness(calc(0.98 - var(--sh-nvg) * 0.06 - var(--sh-noir) * 0.1 + var(--sh-ultra) * 0.08 - var(--sh-spotlight) * 0.08 + var(--sh-custom) * 0.05))
+        blur(calc(var(--scene-blur) * 1px));
+    transform: scale(calc(1 + var(--dist) * 0.003));
+}
+
+#google2dMap {
+    z-index: 0;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    background: #02070d;
+    overflow: hidden;
+    cursor: grab;
+    contain: layout paint;
+    user-select: none;
+    touch-action: none;
+    transition: opacity 160ms ease;
+}
+
+#google2dMap.dragging {
+    cursor: grabbing;
+}
+
+.google-2d-tile-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.google-2d-tile {
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    border: 0;
+    user-select: none;
+    pointer-events: none;
+    background: #07111c;
+    filter: var(--google-2d-filter, none);
+    backface-visibility: hidden;
+    transform-origin: 0 0;
+    will-change: transform;
+}
+
+.google-2d-marker {
+    position: absolute;
+    z-index: 2;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(38, 201, 255, 0.92);
+    border-radius: 50% 50% 50% 0;
+    background: rgba(3, 14, 22, 0.86);
+    box-shadow: 0 0 0 3px rgba(38, 201, 255, 0.16), 0 0 18px rgba(38, 201, 255, 0.38);
+    pointer-events: none;
+}
+
+.google-2d-marker::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(216, 231, 255, 0.96);
+    transform: translate(-50%, -50%);
+}
+
+#google2dMap .leaflet-container,
+#google2dMap.leaflet-container {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: rgba(216, 231, 255, 0.78);
+    font-family: "Share Tech Mono", monospace;
+}
+
+#google2dMap .leaflet-pane,
+#google2dMap .leaflet-tile-pane {
+    z-index: 1;
+}
+
+#google2dMap .leaflet-tile {
+    filter: var(--google-2d-filter, none);
+}
+
+#google2dMap .leaflet-control-attribution {
+    display: none;
+}
+
+#google2dMap .leaflet-grab {
+    cursor: grab;
+}
+
+#google2dMap .leaflet-dragging,
+#google2dMap .leaflet-dragging .leaflet-grab {
+    cursor: grabbing;
+}
+
+.leaflet-vision-marker-wrap {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border: 0;
+}
+
+.leaflet-vision-marker {
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(38, 201, 255, 0.92);
+    border-radius: 50% 50% 50% 0;
+    background: rgba(3, 14, 22, 0.86);
+    box-shadow: 0 0 0 3px rgba(38, 201, 255, 0.16), 0 0 18px rgba(38, 201, 255, 0.38);
+    pointer-events: none;
+    transform-origin: 50% 100%;
+    z-index: 2;
+    transform: rotate(-45deg);
+}
+
+.leaflet-vision-marker::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(216, 231, 255, 0.96);
+    transform: translate(-50%, -50%);
+}
+
+.google-2d-attribution {
+    position: absolute;
+    right: 8px;
+    bottom: 6px;
+    z-index: 3;
+    padding: 2px 6px;
+    border: 1px solid rgba(124, 137, 167, 0.26);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.62);
+    color: rgba(216, 231, 255, 0.72);
+    font-family: "Share Tech Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    pointer-events: none;
+}
+
+body.map-2d-active .pixel-noise,
+body.map-2d-active .scanlines,
+body.map-2d-active .vignette,
+body.map-2d-active .spotlight-mask {
+    display: none;
+}
+
+.cesium-viewer-toolbar,
+.cesium-viewer-bottom,
+.cesium-viewer-animationContainer,
+.cesium-viewer-timelineContainer,
+.cesium-viewer-navigationContainer,
+.cesium-credit-lightbox-overlay,
+.cesium-viewer-fullscreenContainer,
+.cesium-viewer-infoBoxContainer,
+.cesium-infoBox {
+    display: none !important;
+}
+
+.pixel-noise,
+.scanlines,
+.vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.pixel-noise {
+    z-index: 3;
+    opacity: var(--noise);
+    background-image:
+        radial-gradient(circle at 18% 18%, rgba(255, 154, 59, 0.09), transparent 24%),
+        radial-gradient(circle at 82% 28%, rgba(54, 133, 255, 0.08), transparent 28%),
+        radial-gradient(circle at 38% 84%, rgba(255, 73, 95, 0.06), transparent 22%),
+        repeating-radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 6px);
+    mix-blend-mode: screen;
+}
+
+.scanlines {
+    z-index: 4;
+    opacity: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.02) 0,
+        rgba(0, 0, 0, 0.02) 1px,
+        rgba(7, 10, 18, 0.36) 1px,
+        rgba(7, 10, 18, 0.36) 2px
+    );
+}
+
+.vignette {
+    z-index: 2;
+    box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.42), inset 0 0 36px rgba(0, 0, 0, 0.5);
+}
+
+.spotlight-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: normal;
+    transform-origin: 50% 50%;
+    transform: scale(1.01);
+    overflow: hidden;
+    will-change: opacity, transform;
+    background: radial-gradient(
+        circle at 50% 50%,
+        rgba(0, 0, 0, 0) 0,
+        rgba(0, 0, 0, 0) var(--spotlight-radius),
+        rgba(0, 0, 0, var(--spotlight-strength)) calc(var(--spotlight-radius) + 16px),
+        rgba(0, 0, 0, var(--spotlight-strength)) 100%
+    );
+    transition: opacity 220ms ease-out, transform 260ms ease-out;
+}
+
+.spotlight-mask::before {
+    content: none;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.afk-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 34;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(circle at 50% 58%, rgba(5, 14, 31, 0.18), rgba(0, 0, 0, 0.93) 78%);
+    transition: opacity 620ms ease;
+    overflow: hidden;
+}
+
+.afk-overlay.hidden {
+    display: none;
+}
+
+.afk-lightspeed-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.afk-star {
+    border: 1px solid transparent;
+    border-radius: 999px;
+    border-top-color: rgba(240, 248, 255, var(--afk-star-alpha, 0.82));
+    margin: 0;
+    position: absolute;
+    transform-origin: left center;
+    width: var(--afk-star-length, 100vh);
+    opacity: 0;
+    mix-blend-mode: screen;
+    filter: drop-shadow(0 0 7px rgba(128, 203, 255, 0.34));
+    transform: rotate(var(--afk-star-rotation, 0deg)) scaleX(0.01);
+    animation-name: afkLightspeedStreak;
+    animation-duration: var(--afk-star-duration, 4s);
+    animation-delay: var(--afk-star-delay, 0s);
+    animation-iteration-count: infinite;
+    animation-timing-function: cubic-bezier(0.25, 0.08, 0.35, 1);
+    will-change: transform, opacity;
+}
+
+.afk-star.center-safe {
+    width: 1px;
+}
+
+.afk-label {
+    position: absolute;
+    left: 50%;
+    bottom: 10%;
+    transform: translateX(-50%);
+    color: rgba(196, 224, 255, 0.9);
+    font-family: "Orbitron", monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-shadow: 0 0 14px rgba(134, 212, 255, 0.44);
+    opacity: 0.86;
+}
+
+@keyframes crtplusScanDrift {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 7px; }
+}
+
+@keyframes crtplusNoiseShift {
+    0% { transform: translate3d(0, 0, 0) scale(1.01); }
+    25% { transform: translate3d(-0.7%, 0.35%, 0) scale(1.02); }
+    50% { transform: translate3d(0.5%, -0.45%, 0) scale(1.02); }
+    75% { transform: translate3d(-0.35%, -0.25%, 0) scale(1.015); }
+    100% { transform: translate3d(0, 0, 0) scale(1.01); }
+}
+
+@keyframes crtplusFlicker {
+    0% { opacity: 0.88; }
+    10% { opacity: 0.84; }
+    24% { opacity: 0.93; }
+    46% { opacity: 0.87; }
+    61% { opacity: 0.95; }
+    74% { opacity: 0.85; }
+    100% { opacity: 0.9; }
+}
+
+@keyframes scanlineDrift {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 4px; }
+}
+
+@keyframes phosphorPulse {
+    0% { opacity: 0.18; }
+    35% { opacity: 0.24; }
+    67% { opacity: 0.2; }
+    100% { opacity: 0.22; }
+}
+
+@keyframes spotlightReveal {
+    0% {
+        opacity: calc(0.18 * var(--spotlight-strength));
+        transform: scale(1.04);
+    }
+    100% {
+        opacity: var(--spotlight-strength);
+        transform: scale(1);
+    }
+}
+
+@keyframes spotlightHide {
+    0% {
+        opacity: var(--spotlight-strength);
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.03);
+    }
+}
+
+@keyframes afkLightspeedStreak {
+    0% {
+        transform: rotate(var(--afk-star-rotation, 0deg)) scaleX(0.01);
+        opacity: 0;
+    }
+    14% {
+        opacity: var(--afk-star-alpha, 0.82);
+    }
+    84% {
+        opacity: calc(var(--afk-star-alpha, 0.82) * 0.56);
+    }
+    100% {
+        transform: rotate(var(--afk-star-rotation, 0deg)) scaleX(1);
+        opacity: 0;
+    }
+}
+
+.panel {
+    backdrop-filter: blur(7px);
+    border: 1px solid var(--panel-border);
+    background: linear-gradient(160deg, var(--panel-bg), var(--panel-bg-2));
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.42);
+    z-index: 8;
+}
+
+.vision-terminal-panel {
+    position: absolute;
+    inset: 10px;
+    z-index: 44;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    border: 1px solid var(--ui-border);
+    border-radius: 16px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 8%, rgba(38, 201, 255, 0.12), transparent 34%),
+        linear-gradient(160deg, rgba(0, 0, 0, 0.82), rgba(2, 4, 8, 0.94));
+    box-shadow:
+        0 22px 60px rgba(0, 0, 0, 0.74),
+        inset 0 0 0 1px rgba(38, 201, 255, 0.08);
+}
+
+.vision-terminal-panel.hidden {
+    display: none !important;
+}
+
+.vision-terminal-panel iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000001;
+}
+
+body.vision-terminal-active #cesiumContainer,
+body.vision-terminal-active .pixel-noise,
+body.vision-terminal-active .scanlines,
+body.vision-terminal-active .vignette,
+body.vision-terminal-active .spotlight-mask,
+body.vision-terminal-active .hud-top,
+body.vision-terminal-active .left-rail,
+body.vision-terminal-active .right-rail,
+body.vision-terminal-active .bottom-dock,
+body.vision-terminal-active .focus-aircraft,
+body.vision-terminal-active .config-pop,
+body.vision-terminal-active .profile-settings,
+body.vision-terminal-active .recording-panel,
+body.vision-terminal-active .reticle {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.hud-top {
+    position: absolute;
+    top: 10px;
+    left: 14px;
+    right: 14px;
+    height: var(--top-h);
+    display: block;
+    z-index: 10;
+}
+
+.statline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+}
+
+.top-mini-menu {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: min(980px, calc(100vw - 260px));
+    flex-wrap: wrap;
+    z-index: 12;
+}
+
+.mini-preset-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid rgba(121, 133, 161, 0.34);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.72);
+}
+
+.mini-preset-btn,
+.mini-menu-btn {
+    border: 1px solid rgba(121, 133, 161, 0.34);
+    border-radius: 8px;
+    min-height: 28px;
+    padding: 0 9px;
+    background: rgba(0, 0, 0, 0.72);
+    color: rgba(196, 208, 230, 0.9);
+    font-family: "Orbitron", monospace;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.mini-preset-btn {
+    min-height: 24px;
+    padding: 0 8px;
+    font-size: 8px;
+    letter-spacing: 0.07em;
+}
+
+.mini-preset-btn.active {
+    color: rgba(229, 246, 255, 0.98);
+    border-color: #3b82f6;
+    box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.3), 0 0 8px rgba(59, 130, 246, 0.4);
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.mini-preset-btn:hover:not(.active) {
+    border-color: rgba(59, 130, 246, 0.6);
+    color: rgba(229, 246, 255, 0.98);
+}
+
+.record-toggle-btn {
+    min-width: 34px;
+    width: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.record-icon {
+    position: relative;
+    width: 15px;
+    height: 15px;
+    border-radius: 999px;
+    border: 1.35px solid rgba(196, 208, 230, 0.88);
+    box-shadow:
+        inset 0 0 0 1px rgba(196, 208, 230, 0.08),
+        0 0 7px rgba(38, 201, 255, 0.1);
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.record-icon::after {
+    content: "";
+    position: absolute;
+    inset: 3.4px;
+    border-radius: 999px;
+    background: rgba(255, 78, 95, 0.86);
+    box-shadow: 0 0 8px rgba(255, 78, 95, 0.28);
+    opacity: 0.9;
+    transition: opacity 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.record-toggle-btn:hover .record-icon {
+    border-color: rgba(235, 245, 255, 0.96);
+    box-shadow:
+        inset 0 0 0 1px rgba(38, 201, 255, 0.16),
+        0 0 10px rgba(38, 201, 255, 0.22);
+}
+

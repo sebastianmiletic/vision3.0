@@ -1,0 +1,831 @@
+        <aside class="left-rail panel">
+            <section class="info-banner">
+                <p>TOP SECRET // SI-TK // NOFORN</p>
+                <p>11-4166 OPS-4117</p>
+                <p>GLOBAL NEAR LINCOLN MEMORIAL (WASHINGTON DC)</p>
+            </section>
+
+            <section class="sub-panel layers-panel">
+                <header class="layers-panel-header">
+                    <h2>DATA LAYERS</h2>
+                    <span class="layers-panel-badge" id="activeLayerGroupLabel">Global Movement</span>
+                </header>
+
+                <nav class="layer-section-tabs" id="layerSectionTabs" aria-label="Layer sections">
+                    <button type="button" class="layer-section-nav-btn" id="layerGroupPrev" aria-label="Previous layer section">‹</button>
+                    <button type="button" class="layer-section-tab active" id="layerGroupActive" data-group-jump="global-movement" title="Global Movement" aria-live="polite">
+                        <span class="layer-section-tab-title" id="layerGroupActiveTitle">Global Movement</span>
+                        <span class="layer-section-tab-meta" id="layerGroupActiveMeta">Flights + Space</span>
+                    </button>
+                    <button type="button" class="layer-section-nav-btn" id="layerGroupNext" aria-label="Next layer section">›</button>
+                </nav>
+                <div class="layer-section-dots" id="layerSectionDots" aria-label="Layer section position"></div>
+
+                <div class="layers-viewport" id="layersScroll">
+                    <section class="layer-section" data-layer-group="natural-events" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>Natural Events</h3>
+                            <p>Weather, seismic, and terrain monitoring</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="earthquakes">
+                                <div>
+                                    <h3>🪨 Earthquakes (24h)</h3>
+                                    <p id="quakeStatus">USGS · waiting...</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="quakeCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="earthquakes">CFG</button>
+                                        <button class="toggle on" data-toggle="earthquakes">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="volcanoes">
+                                <div>
+                                    <h3>🌋 Volcanoes</h3>
+                                    <p id="volcanoStatus">Smithsonian Open Access · waiting...</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="volcanoCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="volcanoes">CFG</button>
+                                        <button class="toggle on" data-toggle="volcanoes">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="weather">
+                                <div>
+                                    <h3>☁ Weather Radar</h3>
+                                    <p id="weatherStatus">Open-Meteo precipitation field · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="weatherCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="weather">CFG</button>
+                                        <button class="toggle on" data-toggle="weather">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="weatherWind">
+                                <div>
+                                    <h3>🌬 Wind Simulation</h3>
+                                    <p id="windStatus">Open-Meteo wind field · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="windCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="weatherWind">CFG</button>
+                                        <button class="toggle on" data-toggle="weatherWind">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="rainSystems">
+                                <div>
+                                    <h3>🌧 Rain Systems</h3>
+                                    <p id="rainStatus">Open-Meteo precipitation field · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="rainCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="rainSystems">CFG</button>
+                                        <button class="toggle on" data-toggle="rainSystems">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="openTopoData">
+                                <div>
+                                    <h3>⛰ OpenTopoData</h3>
+                                    <p id="openTopoDataStatus">Elevation API · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="openTopoDataCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="openTopoData">CFG</button>
+                                        <button class="toggle on" data-toggle="openTopoData">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section is-active" data-layer-group="global-movement" aria-hidden="false">
+                        <header class="layer-section-header">
+                            <h3>Global Movement</h3>
+                            <p>Flights, ships, satellites, and traffic feeds</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="flights">
+                                <div>
+                                    <h3>✈ Live Flights</h3>
+                                    <p id="flightStatus">OpenSky network · waiting...</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="flightCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="flights">CFG</button>
+                                        <button class="toggle on" data-toggle="flights">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="military">
+                                <div>
+                                    <h3>🛡 Military Flights</h3>
+                                    <p id="militaryStatus">Military ADSB · waiting...</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="militaryCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="military">CFG</button>
+                                        <button class="toggle on" data-toggle="military">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="trains">
+                                <div>
+                                    <h3>🚆 Trains</h3>
+                                    <p id="trainStatus">Global rail network · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="trainCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="trains">CFG</button>
+                                        <button class="toggle on" data-toggle="trains">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="ships">
+                                <div>
+                                    <h3>🚢 Live Ships</h3>
+                                    <p id="shipStatus">AISStream · waiting...</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="shipCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="ships">CFG</button>
+                                        <button class="toggle on" data-toggle="ships">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="satellites">
+                                <div>
+                                    <h3>🛰 Satellites</h3>
+                                    <p id="satStatus">CelesTrak · waiting...</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="satCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="satellites">CFG</button>
+                                        <button class="toggle on" data-toggle="satellites">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="advancedSatellites">
+                                <div>
+                                    <h3>🛰 Advanced Satellites</h3>
+                                    <p id="advSatStatus">CelesTrak advanced · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="advSatCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="advancedSatellites">CFG</button>
+                                        <button class="toggle on" data-toggle="advancedSatellites">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="traffic">
+                                <div>
+                                    <h3>🚗 OpenStreet Particle System</h3>
+                                    <p id="trafficStatus">Traffic awaiting location (5km radius)</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="trafficCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="traffic">CFG</button>
+                                        <button class="toggle on" data-toggle="traffic">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="nasaEarthImagery">
+                                <div>
+                                    <h3>🌍 NASA Earth Imagery</h3>
+                                    <p id="nasaEarthImageryStatus">NASA API · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="nasaEarthImageryCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="nasaEarthImagery">CFG</button>
+                                        <button class="toggle on" data-toggle="nasaEarthImagery">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="launchLibrary">
+                                <div>
+                                    <h3>🚀 Launch Library 2</h3>
+                                    <p id="launchLibraryStatus">The Space Devs · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="launchLibraryCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="launchLibrary">CFG</button>
+                                        <button class="toggle on" data-toggle="launchLibrary">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="spaceXMissions">
+                                <div>
+                                    <h3>🛰 SpaceX Missions</h3>
+                                    <p id="spaceXMissionsStatus">SpaceX API · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="spaceXMissionsCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="spaceXMissions">CFG</button>
+                                        <button class="toggle on" data-toggle="spaceXMissions">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section" data-layer-group="news-conflict" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>News and Conflict</h3>
+                            <p>Global events and conflict signal layers</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="news">
+                                <div>
+                                    <h3>📰 Advanced News</h3>
+                                    <p id="newsStatus">Advanced multi-source feed · waiting...</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="newsCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="news">CFG</button>
+                                        <button class="toggle on" data-toggle="news">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="hdxCrisis">
+                                <div>
+                                    <h3>🆘 HDX Crisis Feed</h3>
+                                    <p id="hdxCrisisStatus">HDX / OCHA · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="hdxCrisisCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="hdxCrisis">CFG</button>
+                                        <button class="toggle on" data-toggle="hdxCrisis">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="shodanIntel">
+                                <div>
+                                    <h3>🌐 Shodan Intel</h3>
+                                    <p id="shodanIntelStatus">Shodan connected-devices feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="shodanIntelCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="shodanIntel">CFG</button>
+                                        <button class="toggle on" data-toggle="shodanIntel">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section" data-layer-group="global-data" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>Global Data</h3>
+                            <p>Macro intelligence and global reference feeds</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="lowyPowerIndex">
+                                <div>
+                                    <h3>📊 Lowy Asia Power Index</h3>
+                                    <p id="lowyPowerIndexStatus">Lowy Institute data bridge · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="lowyPowerIndexCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="lowyPowerIndex">CFG</button>
+                                        <button class="toggle on" data-toggle="lowyPowerIndex">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="wikipediaIntel">
+                                <div>
+                                    <h3>📚 Wikidata / Wikipedia</h3>
+                                    <p id="wikipediaIntelStatus">Wikimedia API · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="wikipediaIntelCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="wikipediaIntel">CFG</button>
+                                        <button class="toggle on" data-toggle="wikipediaIntel">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="worldBankData">
+                                <div>
+                                    <h3>🌐 World Bank API</h3>
+                                    <p id="worldBankDataStatus">World Bank macro feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="worldBankDataCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="worldBankData">CFG</button>
+                                        <button class="toggle on" data-toggle="worldBankData">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section" data-layer-group="government-access" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>Government Access</h3>
+                            <p>Public sector and sanctions intelligence feeds</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="usaspendingGov">
+                                <div>
+                                    <h3>💰 USAspending.gov</h3>
+                                    <p id="usaspendingGovStatus">US Federal spending feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="usaspendingGovCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="usaspendingGov">CFG</button>
+                                        <button class="toggle on" data-toggle="usaspendingGov">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="interpolNotices">
+                                <div>
+                                    <h3>🚨 Interpol Red Notices</h3>
+                                    <p id="interpolNoticesStatus">INTERPOL public notices · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="interpolNoticesCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="interpolNotices">CFG</button>
+                                        <button class="toggle on" data-toggle="interpolNotices">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="opensanctionsGov">
+                                <div>
+                                    <h3>🧾 OpenSanctions (Gov)</h3>
+                                    <p id="opensanctionsGovStatus">OpenSanctions screening feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="opensanctionsGovCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="opensanctionsGov">CFG</button>
+                                        <button class="toggle on" data-toggle="opensanctionsGov">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section" data-layer-group="markets-data" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>Markets Data</h3>
+                            <p>Rates, inflation, macro and FX signal APIs</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="fredMacro">
+                                <div>
+                                    <h3>🏛 FRED Macro</h3>
+                                    <p id="fredMacroStatus">Federal Reserve macro feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="fredMacroCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="fredMacro">CFG</button>
+                                        <button class="toggle on" data-toggle="fredMacro">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="econdbMacro">
+                                <div>
+                                    <h3>📈 EconDB</h3>
+                                    <p id="econdbMacroStatus">Global macro database · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="econdbMacroCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="econdbMacro">CFG</button>
+                                        <button class="toggle on" data-toggle="econdbMacro">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="exchangeRates">
+                                <div>
+                                    <h3>💱 ExchangeRate.host</h3>
+                                    <p id="exchangeRatesStatus">Exchange rate feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="exchangeRatesCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="exchangeRates">CFG</button>
+                                        <button class="toggle on" data-toggle="exchangeRates">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section" data-layer-group="network-configuration" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>Network Configuration</h3>
+                            <p>Internet scanning and threat telemetry</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="censysScan">
+                                <div>
+                                    <h3>🧭 Censys</h3>
+                                    <p id="censysScanStatus">Infrastructure scan API · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="censysScanCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="censysScan">CFG</button>
+                                        <button class="toggle on" data-toggle="censysScan">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="opensanctionsNet">
+                                <div>
+                                    <h3>🧾 OpenSanctions (Network)</h3>
+                                    <p id="opensanctionsNetStatus">Sanctions intelligence feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="opensanctionsNetCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="opensanctionsNet">CFG</button>
+                                        <button class="toggle on" data-toggle="opensanctionsNet">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="greynoiseScan">
+                                <div>
+                                    <h3>👁 GreyNoise</h3>
+                                    <p id="greynoiseScanStatus">Internet scan activity feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="greynoiseScanCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="greynoiseScan">CFG</button>
+                                        <button class="toggle on" data-toggle="greynoiseScan">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="abuseipdbThreat">
+                                <div>
+                                    <h3>🛡 AbuseIPDB</h3>
+                                    <p id="abuseipdbThreatStatus">Malicious IP telemetry · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="abuseipdbThreatCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="abuseipdbThreat">CFG</button>
+                                        <button class="toggle on" data-toggle="abuseipdbThreat">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="urlhausThreat">
+                                <div>
+                                    <h3>🧬 URLhaus</h3>
+                                    <p id="urlhausThreatStatus">Malware URL feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="urlhausThreatCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="urlhausThreat">CFG</button>
+                                        <button class="toggle on" data-toggle="urlhausThreat">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section" data-layer-group="lines" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>Lines</h3>
+                            <p>Orbital overlays and route systems</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="orbital">
+                                <div>
+                                    <h3>🌐 Orbital Corridors</h3>
+                                    <p id="orbitalStatus">Strategic overlays · loading...</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="orbitalCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="orbital">CFG</button>
+                                        <button class="toggle on" data-toggle="orbital">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="pipelines">
+                                <div>
+                                    <h3>🛢 Pipelines</h3>
+                                    <p id="pipelineStatus">Global pipeline routes · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="pipelineCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="pipelines">CFG</button>
+                                        <button class="toggle on" data-toggle="pipelines">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="tradeRoutes">
+                                <div>
+                                    <h3>📦 Trade Routes</h3>
+                                    <p id="tradeStatus">Global maritime trade lanes · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="tradeCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="tradeRoutes">CFG</button>
+                                        <button class="toggle on" data-toggle="tradeRoutes">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="underseaCables">
+                                <div>
+                                    <h3>🌊 Undersea Cables</h3>
+                                    <p id="cableStatus">Subsea cable map · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="cableCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="underseaCables">CFG</button>
+                                        <button class="toggle on" data-toggle="underseaCables">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="powerCables">
+                                <div>
+                                    <h3>⚡ Power Cables</h3>
+                                    <p id="powerStatus">Global power transmission map · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="powerCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="powerCables">CFG</button>
+                                        <button class="toggle on" data-toggle="powerCables">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section" data-layer-group="location-markers" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>Location Markers</h3>
+                            <p>Static and strategic location marker sets</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item" data-layer="locationBanks">
+                                <div>
+                                    <h3>🏦 Central Banks</h3>
+                                    <p id="locationBanksStatus">Strategic marker feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="locationBanksCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="locationBanks">CFG</button>
+                                        <button class="toggle on" data-toggle="locationBanks">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="layer-item" data-layer="locationCommodityHubs">
+                                <div>
+                                    <h3>⛽ Commodity Hubs</h3>
+                                    <p id="locationCommodityStatus">Strategic marker feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="locationCommodityCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="locationCommodityHubs">CFG</button>
+                                        <button class="toggle on" data-toggle="locationCommodityHubs">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="layer-item" data-layer="locationMilitaryBases">
+                                <div>
+                                    <h3>🪖 Military Bases</h3>
+                                    <p id="locationMilitaryStatus">Strategic marker feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="locationMilitaryCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="locationMilitaryBases">CFG</button>
+                                        <button class="toggle on" data-toggle="locationMilitaryBases">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="layer-item" data-layer="locationNuclearSites">
+                                <div>
+                                    <h3>☢ Nuclear Sites</h3>
+                                    <p id="locationNuclearStatus">Strategic marker feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="locationNuclearCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="locationNuclearSites">CFG</button>
+                                        <button class="toggle on" data-toggle="locationNuclearSites">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="layer-item" data-layer="locationSpacePorts">
+                                <div>
+                                    <h3>🚀 Space Ports</h3>
+                                    <p id="locationSpaceStatus">Strategic marker feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="locationSpaceCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="locationSpacePorts">CFG</button>
+                                        <button class="toggle on" data-toggle="locationSpacePorts">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="layer-item" data-layer="locationCriticalMinerals">
+                                <div>
+                                    <h3>🧱 Critical Minerals</h3>
+                                    <p id="locationMineralsStatus">Strategic marker feed · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="locationMineralsCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="locationCriticalMinerals">CFG</button>
+                                        <button class="toggle on" data-toggle="locationCriticalMinerals">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="layer-section" data-layer-group="addons" aria-hidden="true">
+                        <header class="layer-section-header">
+                            <h3>Addons</h3>
+                            <p>Integrated Vision apps and operator tools</p>
+                        </header>
+                        <div class="layer-section-content">
+                            <article class="layer-item addon-layer-item" data-addon-open="key-locations">
+                                <div>
+                                    <h3>⌖ Key Locations</h3>
+                                    <p id="keyLocationsAddonStatus">100+ landmark views and pinned places</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="keyLocationsAddonCount">100+</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-addon-open="key-locations">OPEN</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="layer-item addon-layer-item" data-addon-open="place-inspector">
+                                <div>
+                                    <h3>⌕ Location Marker</h3>
+                                    <p id="placeInspectorAddonStatus">Double-click houses, buildings, or sites to inspect and pin</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="placeInspectorAddonCount">PIN</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-addon-open="place-inspector">OPEN</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="layer-item addon-layer-item" data-addon-open="vzn-terminal">
+                                <div>
+                                    <h3>▰ VZN Terminal</h3>
+                                    <p id="vznTerminalAddonStatus">Command stream and app control language</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="vznTerminalAddonCount">VZN</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-addon-open="vzn-terminal">OPEN</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="sub-panel key-locations-panel hidden" id="keyLocationsPanel" aria-hidden="true">
+                <header class="key-locations-head">
+                    <div>
+                        <h2>KEY LOCATIONS</h2>
+                        <p id="keyLocationsMeta">Preset landmark views and pinned places</p>
+                    </div>
+                    <button class="tiny-btn" id="keyLocationsBackBtn" type="button">×</button>
+                </header>
+                <div class="key-location-tools">
+                    <input id="keyLocationSearch" type="text" placeholder="Search Eiffel Tower, bridge, arena...">
+                </div>
+                <section class="key-location-list-section">
+                    <header>
+                        <h3>PINNED PLACES</h3>
+                        <span id="keyLocationPinnedCount">0</span>
+                    </header>
+                    <div class="key-location-list key-location-gallery" id="keyLocationPinnedList"></div>
+                </section>
+                <section class="key-location-list-section">
+                    <header>
+                        <h3>PRELOADED LOCATIONS</h3>
+                        <span id="keyLocationPresetCount">0</span>
+                    </header>
+                    <div class="key-location-list key-location-gallery" id="keyLocationPresetList"></div>
+                </section>
+            </section>
+
+            <section class="sub-panel key-locations-panel place-inspector-panel hidden" id="placeInspectorPanel" aria-hidden="true">
+                <header class="key-locations-head">
+                    <div>
+                        <h2>LOCATION MARKER</h2>
+                        <p id="placeInspectorMeta">Double-click the map to inspect exact houses, buildings, and places</p>
+                    </div>
+                    <button class="tiny-btn" id="placeInspectorBackBtn" type="button">×</button>
+                </header>
+                <section class="key-location-inspector" id="keyLocationInspector">
+                    <h3>LOCATION MARKER</h3>
+                    <p id="keyLocationInspectStatus">Double-click anywhere on the map to inspect address and pin exact places.</p>
+                    <div class="location-marker-tools">
+                        <span>Viewport screenshot becomes the pinned thumbnail.</span>
+                        <button class="chip" id="keyLocationCopyInspectedBtn" type="button" disabled>COPY COORDS</button>
+                        <button class="chip" id="keyLocationClearInspectedBtn" type="button" disabled>CLEAR</button>
+                    </div>
+                    <div class="key-location-preview hidden" id="keyLocationPreviewWrap">
+                        <img id="keyLocationPreview" alt="Selected place map preview">
+                    </div>
+                    <div class="key-location-fields" id="keyLocationInspectFields"></div>
+                    <div class="key-location-actions">
+                        <button class="chip" id="keyLocationFlyInspectedBtn" type="button" disabled>GO</button>
+                        <button class="chip" id="keyLocationPinInspectedBtn" type="button" disabled>PIN PLACE</button>
+                    </div>
+                </section>
+                <section class="key-location-list-section location-marker-pins">
+                    <header>
+                        <h3>PINNED PLACES</h3>
+                        <span id="keyLocationInspectorPinnedCount">0</span>
+                    </header>
+                    <div class="key-location-list key-location-gallery" id="keyLocationInspectorPinnedList"></div>
+                </section>
+            </section>
+
+            <section class="sub-panel vzn-terminal-addon-panel hidden" id="vznTerminalPanel" aria-hidden="true">
+                <header class="vzn-terminal-head">
+                    <div>
+                        <h2>VZN TERMINAL</h2>
+                        <p>Live command stream · type <strong>/help</strong></p>
+                    </div>
+                    <button class="tiny-btn" id="vznTerminalBackBtn" type="button">×</button>
+                </header>
+                <div class="vzn-terminal-output" id="vznTerminalOutput" aria-live="polite"></div>
+                <form class="vzn-terminal-input-row" id="vznTerminalForm">
+                    <span>vzn&gt;</span>
+                    <input id="vznTerminalInput" type="text" autocomplete="off" spellcheck="false" placeholder="/help">
+                </form>
+            </section>
+        </aside>
+

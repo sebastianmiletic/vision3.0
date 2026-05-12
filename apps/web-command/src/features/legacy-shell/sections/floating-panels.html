@@ -1,0 +1,90 @@
+        <section class="focus-aircraft panel hidden" id="focusAircraftCard" aria-hidden="true">
+            <header>
+                <h4 id="focusCardTitle">TRACKED OBJECT</h4>
+                <span id="focusCardLayer">FLIGHT</span>
+            </header>
+            <p class="focus-aircraft-row"><span id="focusCardHexLabel">HEX</span><strong id="focusCardHex">--</strong></p>
+            <p class="focus-aircraft-row"><span id="focusCardRegistrationLabel">REG</span><strong id="focusCardRegistration">--</strong></p>
+            <p class="focus-aircraft-row"><span id="focusCardTypeLabel">TYPE</span><strong id="focusCardType">--</strong></p>
+            <p class="focus-aircraft-row"><span id="focusCardAltitudeLabel">ALT</span><strong id="focusCardAltitude">--</strong></p>
+            <p class="focus-aircraft-row"><span id="focusCardSpeedLabel">SPD</span><strong id="focusCardSpeed">--</strong></p>
+            <p class="focus-aircraft-row"><span id="focusCardHeadingLabel">HDG</span><strong id="focusCardHeading">--</strong></p>
+            <p class="focus-aircraft-row"><span id="focusCardSquawkLabel">SQK</span><strong id="focusCardSquawk">--</strong></p>
+            <p class="focus-aircraft-row"><span id="focusCardAffiliationLabel">AFFIL</span><strong id="focusCardAffiliation">--</strong></p>
+            <p class="focus-aircraft-foot" id="focusCardSource">SRC: --</p>
+        </section>
+
+        <section class="flight-info-panel panel hidden" id="flightInfoPanel" aria-hidden="true">
+            <header class="flight-info-header">
+                <div class="flight-info-header-top">
+                    <h4 id="flightInfoCallsign">FLIGHT</h4>
+                    <button class="flight-info-close" id="flightInfoCloseBtn" type="button">×</button>
+                </div>
+                <span class="flight-info-mode" id="flightInfoMode">ISOLATED VIEW</span>
+            </header>
+            <div class="flight-info-grid">
+                <div class="flight-info-row"><span class="flight-info-label">ICAO HEX</span><span class="flight-info-value" id="flightInfoHex">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">REGISTRATION</span><span class="flight-info-value" id="flightInfoReg">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">AIRCRAFT TYPE</span><span class="flight-info-value" id="flightInfoType">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">OPERATOR</span><span class="flight-info-value" id="flightInfoOperator">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">ROUTE</span><span class="flight-info-value" id="flightInfoRoute">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">ALTITUDE</span><span class="flight-info-value" id="flightInfoAlt">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">GROUND SPEED</span><span class="flight-info-value" id="flightInfoSpeed">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">HEADING</span><span class="flight-info-value" id="flightInfoHdg">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">SQUAWK</span><span class="flight-info-value" id="flightInfoSquawk">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">AFFILIATION</span><span class="flight-info-value" id="flightInfoAffil">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">LATITUDE</span><span class="flight-info-value" id="flightInfoLat">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">LONGITUDE</span><span class="flight-info-value" id="flightInfoLon">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">VERTICAL RATE</span><span class="flight-info-value" id="flightInfoVertRate">--</span></div>
+                <div class="flight-info-row"><span class="flight-info-label">DATA SOURCE</span><span class="flight-info-value" id="flightInfoSource">--</span></div>
+            </div>
+            <div class="flight-info-actions">
+                <button class="chip flight-info-action-btn" id="flightInfoFocusBtn" type="button">FOCUS CLOSE</button>
+                <button class="chip flight-info-action-btn" id="flightInfoReleaseBtn" type="button">RELEASE ALL</button>
+            </div>
+        </section>
+
+        <section class="config-pop panel hidden" id="layerConfigPanel" aria-hidden="true">
+            <header>
+                <h4 id="configTitle">Layer Configuration</h4>
+                <button class="tiny-btn" id="cfgClose" type="button">×</button>
+            </header>
+            <div class="cfg-content" id="cfgDynamic"></div>
+            <div class="cfg-actions">
+                <button class="chip" id="cfgApply" type="button">Apply</button>
+            </div>
+        </section>
+
+        <section class="profile-settings panel hidden" id="profileSettingsPanel" aria-hidden="true">
+            <header>
+                <h4>DEVICE SETTINGS</h4>
+                <button class="tiny-btn" id="profileSettingsCloseBtn" type="button">×</button>
+            </header>
+            <p class="profile-settings-note">Settings, presets, and layer states are saved locally on this device/browser profile.</p>
+            <label>Profile Name<input id="profileNameInput" type="text" maxlength="80" placeholder="Local profile name"></label>
+            <div class="profile-settings-tabs" role="tablist" aria-label="Settings categories">
+                <button class="chip profile-settings-tab-btn active" id="profileTabUserSettings" type="button" data-settings-tab="user-settings">USER SETTINGS</button>
+                <button class="chip profile-settings-tab-btn" id="profileTabPreferences" type="button" data-settings-tab="preferences">PREFERENCES</button>
+            </div>
+            <p class="profile-settings-note profile-settings-note-passive">Defaults are passive unless noted. The former AFK control now opens Vision Terminal.</p>
+            <section class="profile-settings-tab-panel" id="profileSettingsUserPanel" aria-hidden="false">
+                <p class="profile-settings-count" id="profileSettingsUserCount">Loading user settings...</p>
+                <div class="profile-settings-grid" id="profileSettingsUserGrid"></div>
+            </section>
+            <section class="profile-settings-tab-panel hidden" id="profileSettingsPreferencesPanel" aria-hidden="true">
+                <p class="profile-settings-count" id="profileSettingsPreferencesCount">Loading preferences...</p>
+                <div class="profile-settings-grid" id="profileSettingsPreferencesGrid"></div>
+            </section>
+            <section class="profile-settings-api" id="profileSettingsApiPanel" aria-label="API Information">
+                <header class="profile-settings-api-header">
+                    <h5>API INFORMATION</h5>
+                    <button class="chip profile-api-refresh-btn" id="profileApiInfoRefreshBtn" type="button">REFRESH</button>
+                </header>
+                <p class="profile-settings-count" id="profileApiInfoSummary">Loading API snapshot...</p>
+                <div class="profile-settings-api-list" id="profileApiInfoList"></div>
+            </section>
+            <div class="cfg-actions">
+                <button class="chip" id="profileSettingsResetBtn" type="button">Reset Defaults</button>
+                <button class="chip" id="profileSettingsSaveBtn" type="button">Save</button>
+            </div>
+        </section>

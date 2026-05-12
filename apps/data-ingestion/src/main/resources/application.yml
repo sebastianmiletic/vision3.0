@@ -1,0 +1,27 @@
+server:
+  port: 8083
+
+vision:
+  polling:
+    enabled: true
+    bootstrap-enabled: true
+    interval-ms: 30000
+  integrations:
+    open-sky:
+      base-url: ${VISION_INTEGRATIONS_OPENSKY_BASE_URL:https://opensky-network.org/api}
+      token-url: ${VISION_INTEGRATIONS_OPENSKY_TOKEN_URL:https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token}
+      client-id: ${VISION_INTEGRATIONS_OPENSKY_CLIENT_ID:}
+      client-secret: ${VISION_INTEGRATIONS_OPENSKY_CLIENT_SECRET:}
+    usgs:
+      feed-url: ${VISION_INTEGRATIONS_USGS_FEED_URL:https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson}
+    celes-trak:
+      feed-url: ${VISION_INTEGRATIONS_CELESTRAK_FEED_URL:https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=json}
+    rain-viewer:
+      feed-url: ${VISION_INTEGRATIONS_RAINVIEWER_FEED_URL:https://api.rainviewer.com/public/weather-maps.json}
+    geospatial:
+      base-url: ${VISION_INTEGRATIONS_GEOSPATIAL_BASE_URL:http://localhost:8082}
+
+logging:
+  level:
+    root: INFO
+    com.deltalabs.vision: DEBUG

@@ -1,0 +1,54 @@
+        <section class="bottom-dock panel">
+            <div class="styles-row">
+                <button class="style-btn active" data-style="normal">◯<span>Normal</span></button>
+                <button class="style-btn" data-style="crt">▣<span>CRT</span></button>
+                <button class="style-btn" data-style="nvg">☽<span>NVG</span></button>
+                <button class="style-btn" data-style="noir">◐<span>Noir</span></button>
+                <button class="style-btn" data-style="spotlight">◎<span>Spotlight</span></button>
+                <button class="style-btn" data-style="flir">◌<span>FLIR</span></button>
+                <button class="recenter-earth-btn" id="earthRecenterBtn" type="button" title="Recentre Earth" aria-label="Recentre Earth" onclick="window.__recenterEarth && window.__recenterEarth()">
+                    <span class="mini-earth-icon" aria-hidden="true"></span>
+                </button>
+                <button class="map-mode-toggle-btn" id="mapModeToggleBtn" type="button" title="Switch to 2D map" aria-label="Switch to 2D map">2D</button>
+                <div class="search-inline">
+                    <span class="search-glyph">⌕</span>
+                    <input id="locationSearch" type="text" placeholder="Address or lat,lon">
+                </div>
+            </div>
+            <p class="search-status" id="searchStatus"></p>
+        </section>
+
+        <section class="command-palette hidden" id="commandPalette" aria-hidden="true">
+            <div class="command-palette-shell">
+                <div class="command-palette-head">
+                    <span>COMMAND SEARCH</span>
+                    <span>CMD/CTRL + K</span>
+                </div>
+                <input id="commandPaletteInput" type="text" placeholder="Search settings, layers, addons...">
+                <div class="command-palette-list" id="commandPaletteList"></div>
+            </div>
+        </section>
+
+        <section class="api-guide-panel hidden" id="apiGuidePanel" aria-hidden="true">
+            <div class="api-guide-shell">
+                <header class="api-guide-head">
+                    <h4>API SETUP GUIDE</h4>
+                    <button class="tiny-btn" id="apiGuideCloseBtn" type="button">×</button>
+                </header>
+                <div class="api-guide-list" id="apiGuideList"></div>
+            </div>
+        </section>
+
+        <section class="ui-confirm hidden" id="uiConfirmModal" aria-hidden="true">
+            <div class="ui-confirm-card">
+                <h4 id="uiConfirmTitle">Confirm Action</h4>
+                <p id="uiConfirmMessage">Are you sure?</p>
+                <div class="ui-confirm-actions">
+                    <button class="chip ghost" id="uiConfirmCancelBtn" type="button">Cancel</button>
+                    <button class="chip" id="uiConfirmOkBtn" type="button">Confirm</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="reticle"></div>
+
