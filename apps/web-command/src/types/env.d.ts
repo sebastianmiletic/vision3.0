@@ -10,3 +10,11 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+interface Window {
+  CESIUM_BASE_URL?: string;
+  __recenterEarth?: () => void;
+  __applyPerformancePreset?: (preset: string) => void;
+  __setCameraFocusMode?: (mode: 'mouse' | 'crosshair') => void;
+  __getCameraFocusMode?: () => 'mouse' | 'crosshair';
+}

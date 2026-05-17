@@ -1,9 +1,12 @@
 server:
-  port: 8081
+  port: 8082
 
 vision:
   geospatial:
-    base-url: ${VISION_GEOSPATIAL_BASE_URL:http://localhost:8082}
+    base-url: ${VISION_GEOSPATIAL_BASE_URL:http://localhost:8083}
+  webcams:
+    base-url: ${VISION_WEBCAMS_BASE_URL:https://api.windy.com}
+    api-key: ${VISION_WEBCAMS_API_KEY:}
 
 logging:
   level:

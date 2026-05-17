@@ -1,11 +1,18 @@
 import { useFlightsLayer } from '../../flights/hooks/useFlightsLayer';
-import { useCesiumViewer } from '../hooks/useCesiumViewer';
+import { useMilitaryFlightsLayer } from '../../military-flights/hooks/useMilitaryFlightsLayer';
+import { useSatellitesLayer } from '../../satellites/hooks/useSatellitesLayer';
 
-const CESIUM_CONTAINER_ID = 'cesiumContainer';
+import type { MutableRefObject } from 'react';
+import type { Viewer } from 'cesium';
 
-export function GlobeViewport() {
-  const viewerRef = useCesiumViewer(CESIUM_CONTAINER_ID);
+type GlobeViewportProps = {
+  viewerRef: MutableRefObject<Viewer | null>;
+};
+
+export function GlobeViewport({ viewerRef }: GlobeViewportProps) {
   useFlightsLayer(viewerRef);
+  useMilitaryFlightsLayer(viewerRef);
+  useSatellitesLayer(viewerRef);
 
-  return <div id={CESIUM_CONTAINER_ID} className="globe-canvas-host" aria-label="3D command globe viewport" />;
+  return <div id="cesiumContainer" className="globe-canvas-host" aria-label="3D command globe viewport" />;
 }

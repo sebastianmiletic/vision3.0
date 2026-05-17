@@ -747,6 +747,30 @@
                                     </div>
                                 </div>
                             </article>
+                            <article class="layer-item addon-layer-item" data-addon-open="metadata-spoofing">
+                                <div>
+                                    <h3>🧾 Metadata Spoofing</h3>
+                                    <p id="metadataSpoofingAddonStatus">Upload images and inspect EXIF metadata in a clean report</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="metadataSpoofingAddonCount">EXIF</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-addon-open="metadata-spoofing">OPEN</button>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="layer-item addon-layer-item" data-addon-open="cctv-monitor">
+                                <div>
+                                    <h3>📹 Public CCTV Monitor</h3>
+                                    <p id="cctvAddonStatus">Load live public webcams by country, region, and city</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="cctvAddonCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-addon-open="cctv-monitor">OPEN</button>
+                                    </div>
+                                </div>
+                            </article>
                         </div>
                     </section>
                 </div>
@@ -827,5 +851,126 @@
                     <input id="vznTerminalInput" type="text" autocomplete="off" spellcheck="false" placeholder="/help">
                 </form>
             </section>
-        </aside>
 
+            <section class="sub-panel metadata-addon-panel hidden" id="metadataSpoofingPanel" aria-hidden="true">
+                <header class="metadata-addon-head">
+                    <div>
+                        <h2>METADATA SPOOFING</h2>
+                        <p>Upload image files and extract EXIF tags for structured analysis.</p>
+                    </div>
+                    <button class="tiny-btn" id="metadataSpoofingBackBtn" type="button">×</button>
+                </header>
+
+                <div class="metadata-upload-row">
+                    <input id="metadataUploadInput" type="file" accept="image/*" hidden>
+                    <button class="chip" id="metadataUploadTriggerBtn" type="button">UPLOAD IMAGE</button>
+                    <button class="chip" id="metadataClearBtn" type="button" disabled>CLEAR</button>
+                    <button class="chip" id="metadataCopyJsonBtn" type="button" disabled>COPY JSON</button>
+                </div>
+                <p class="metadata-status" id="metadataStatus">Ready. Upload a JPG/PNG/HEIC image.</p>
+                <p class="metadata-filename" id="metadataFileName">No file loaded.</p>
+
+                <section class="metadata-summary-panel">
+                    <header>
+                        <h3>SUMMARY</h3>
+                    </header>
+                    <div class="metadata-summary-grid" id="metadataSummaryGrid"></div>
+                </section>
+
+                <section class="metadata-tags-panel">
+                    <header>
+                        <h3>TAGS</h3>
+                    </header>
+                    <div class="metadata-tag-list" id="metadataTagList"></div>
+                </section>
+
+                <section class="metadata-raw-panel">
+                    <header>
+                        <h3>RAW JSON</h3>
+                    </header>
+                    <pre id="metadataRawJson">No metadata parsed yet.</pre>
+                </section>
+            </section>
+
+            <section class="sub-panel cctv-addon-panel hidden" id="cctvMonitorPanel" aria-hidden="true">
+                <header class="cctv-addon-head">
+                    <div>
+                        <h2>PUBLIC CCTV MONITOR</h2>
+                        <p>Live public camera feeds via Windy Webcams API (tokenized image URLs).</p>
+                    </div>
+                    <button class="tiny-btn" id="cctvMonitorBackBtn" type="button">×</button>
+                </header>
+
+                <div class="cctv-controls-grid">
+                    <label>
+                        Country
+                        <select id="cctvCountrySelect">
+                            <option value="">All countries</option>
+                        </select>
+                    </label>
+                    <label>
+                        State / Region
+                        <select id="cctvRegionSelect">
+                            <option value="">All states/regions</option>
+                        </select>
+                    </label>
+                    <label>
+                        City
+                        <select id="cctvCitySelect">
+                            <option value="">All cities</option>
+                        </select>
+                    </label>
+                    <label>
+                        Status
+                        <select id="cctvStatusSelect">
+                            <option value="">All statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </label>
+                    <label>
+                        Sort
+                        <select id="cctvSortSelect">
+                            <option value="views">Most Viewed</option>
+                            <option value="recent">Most Recent</option>
+                            <option value="title">Title A-Z</option>
+                        </select>
+                    </label>
+                    <label>
+                        Search
+                        <input id="cctvSearchInput" type="text" placeholder="Search camera title...">
+                    </label>
+                </div>
+
+                <div class="cctv-action-row">
+                    <button class="chip" id="cctvRefreshBtn" type="button">REFRESH</button>
+                    <button class="chip" id="cctvResetFiltersBtn" type="button">RESET FILTERS</button>
+                    <span class="cctv-count">VISIBLE CAMS: <strong id="cctvCameraCount">0</strong></span>
+                </div>
+                <p class="cctv-status" id="cctvMonitorStatus">Initializing CCTV monitor...</p>
+
+                <section class="cctv-quick-view">
+                    <header>
+                        <h3>QUICK VIEW</h3>
+                    </header>
+                    <img id="cctvQuickPreviewImage" alt="No camera selected">
+                    <div class="cctv-quick-meta">
+                        <p id="cctvQuickTitle">No Camera Selected</p>
+                        <p id="cctvQuickMeta">Pick a camera from the list.</p>
+                        <p id="cctvQuickCoords">--</p>
+                    </div>
+                    <div class="cctv-quick-actions">
+                        <button class="chip" id="cctvFullscreenBtn" type="button">FULLSCREEN</button>
+                        <button class="chip" id="cctvOpenPlayerBtn" type="button">OPEN PLAYER</button>
+                    </div>
+                </section>
+
+                <section class="cctv-list-panel">
+                    <header>
+                        <h3>CAMERA GRID</h3>
+                    </header>
+                    <div class="cctv-camera-list" id="cctvCameraList"></div>
+                    <button class="chip cctv-load-more" id="cctvLoadMoreBtn" type="button">LOAD MORE</button>
+                </section>
+            </section>
+        </aside>

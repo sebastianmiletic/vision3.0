@@ -78,7 +78,7 @@ export function CommandCenterLayout({ children }: CommandCenterLayoutProps) {
           <span>⟳</span>
           <span>⌂</span>
         </div>
-        <div className="browser-url">◉ localhost:8080</div>
+        <div className="browser-url">◉ localhost:8081</div>
         <div className="browser-tools">
           <span>⌁</span>
           <span>⛶</span>

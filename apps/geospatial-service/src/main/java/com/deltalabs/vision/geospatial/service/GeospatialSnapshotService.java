@@ -25,6 +25,10 @@ public class GeospatialSnapshotService {
     return snapshot().flights();
   }
 
+  public List<FlightTrack> militaryFlights() {
+    return snapshot().militaryFlights();
+  }
+
   public List<EarthquakeEvent> earthquakes() {
     return snapshot().earthquakes();
   }
@@ -39,6 +43,10 @@ public class GeospatialSnapshotService {
 
   public void ingestFlights(List<FlightTrack> flights) {
     store.updateFlights(flights);
+  }
+
+  public void ingestMilitaryFlights(List<FlightTrack> flights) {
+    store.updateMilitaryFlights(flights);
   }
 
   public void ingestEarthquakes(List<EarthquakeEvent> earthquakes) {

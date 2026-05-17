@@ -21,6 +21,10 @@ public class GeospatialIngestClient {
     restClient.post().uri("/api/v1/geospatial/ingest/flights").body(flights).retrieve().toBodilessEntity();
   }
 
+  public void ingestMilitaryFlights(List<FlightTrack> flights) {
+    restClient.post().uri("/api/v1/geospatial/ingest/military-flights").body(flights).retrieve().toBodilessEntity();
+  }
+
   public void ingestEarthquakes(List<EarthquakeEvent> earthquakes) {
     restClient.post().uri("/api/v1/geospatial/ingest/earthquakes").body(earthquakes).retrieve().toBodilessEntity();
   }

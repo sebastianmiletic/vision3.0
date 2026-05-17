@@ -65,18 +65,36 @@ public class OpenSkyPollingService {
       if (lat == null || lon == null || lat.isNull() || lon.isNull()) {
         continue;
       }
+      if (!lat.isNumber() || !lon.isNumber()) {
+        continue;
+      }
+
+      double latitude = lat.asDouble();
+      double longitude = lon.asDouble();
+      if (!Double.isFinite(latitude)
+          || !Double.isFinite(longitude)
+          || latitude < -90
+          || latitude > 90
+          || longitude < -180
+          || longitude > 180) {
+        continue;
+      }
 
       String icao24 = state.path(0).asText();
       String callsign = state.path(1).asText("UNKNOWN").trim();
-      double altitudeMeters = state.path(7).asDouble(0.0);
-      double speedKnots = state.path(9).asDouble(0.0) * 1.94384;
+      double barometricAltitudeMeters = state.path(7).asDouble(Double.NaN);
+      double geometricAltitudeMeters = state.path(13).asDouble(Double.NaN);
+      double altitudeMeters = Double.isFinite(barometricAltitudeMeters)
+          ? barometricAltitudeMeters
+          : Double.isFinite(geometricAltitudeMeters) ? geometricAltitudeMeters : 0.0;
+      double speedKnots = Math.max(state.path(9).asDouble(0.0) * 1.94384, 0.0);
       double headingDegrees = state.path(10).asDouble(0.0);
 
       flights.add(new FlightTrack(
           "flight-" + icao24,
           callsign,
-          lat.asDouble(),
-          lon.asDouble(),
+          latitude,
+          longitude,
           altitudeMeters,
           speedKnots,
           headingDegrees,

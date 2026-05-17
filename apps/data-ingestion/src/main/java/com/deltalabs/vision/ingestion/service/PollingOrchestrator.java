@@ -2,6 +2,7 @@ package com.deltalabs.vision.ingestion.service;
 
 import com.deltalabs.vision.ingestion.domain.PollBatch;
 import com.deltalabs.vision.ingestion.domain.SourcePollResult;
+import com.deltalabs.vision.ingestion.integrations.adsblol.AdsbMilitaryPollingService;
 import com.deltalabs.vision.ingestion.integrations.celestrak.CelesTrakPollingService;
 import com.deltalabs.vision.ingestion.integrations.geospatial.GeospatialIngestClient;
 import com.deltalabs.vision.ingestion.integrations.opensky.OpenSkyPollingService;
@@ -18,17 +19,20 @@ public class PollingOrchestrator {
   private static final Logger LOGGER = LoggerFactory.getLogger(PollingOrchestrator.class);
 
   private final OpenSkyPollingService openSkyPollingService;
+  private final AdsbMilitaryPollingService adsbMilitaryPollingService;
   private final UsgsPollingService usgsPollingService;
   private final CelesTrakPollingService celesTrakPollingService;
   private final RainViewerPollingService rainViewerPollingService;
   private final GeospatialIngestClient geospatialIngestClient;
 
   public PollingOrchestrator(OpenSkyPollingService openSkyPollingService,
+                             AdsbMilitaryPollingService adsbMilitaryPollingService,
                              UsgsPollingService usgsPollingService,
                              CelesTrakPollingService celesTrakPollingService,
                              RainViewerPollingService rainViewerPollingService,
                              GeospatialIngestClient geospatialIngestClient) {
     this.openSkyPollingService = openSkyPollingService;
+    this.adsbMilitaryPollingService = adsbMilitaryPollingService;
     this.usgsPollingService = usgsPollingService;
     this.celesTrakPollingService = celesTrakPollingService;
     this.rainViewerPollingService = rainViewerPollingService;
@@ -41,6 +45,10 @@ public class PollingOrchestrator {
     var openSkyBatch = openSkyPollingService.poll();
     publish(openSkyBatch, () -> geospatialIngestClient.ingestFlights(openSkyBatch.records()));
     results.add(toResult(openSkyBatch));
+
+    var militaryBatch = adsbMilitaryPollingService.poll();
+    publish(militaryBatch, () -> geospatialIngestClient.ingestMilitaryFlights(militaryBatch.records()));
+    results.add(toResult(militaryBatch));
 
     var usgsBatch = usgsPollingService.poll();
     publish(usgsBatch, () -> geospatialIngestClient.ingestEarthquakes(usgsBatch.records()));

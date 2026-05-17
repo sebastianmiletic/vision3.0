@@ -66,6 +66,7 @@ export type ThemeConfig = z.infer<typeof themeConfigSchema>;
 
 export const geospatialSnapshotSchema = z.object({
   flights: z.array(flightTrackSchema),
+  militaryFlights: z.array(flightTrackSchema),
   earthquakes: z.array(earthquakeEventSchema),
   satellites: z.array(satelliteStateSchema),
   radarFrames: z.array(radarFrameSchema),

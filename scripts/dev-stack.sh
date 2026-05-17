@@ -11,7 +11,7 @@ if [[ -f .env.local ]]; then
   set +a
 fi
 
-required_ports=(8080 8081 8082 8083)
+required_ports=(8081 8082 8083 8084)
 for port in "${required_ports[@]}"; do
   if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
     echo "Port $port is already in use. Stop the process first, then rerun npm run dev."

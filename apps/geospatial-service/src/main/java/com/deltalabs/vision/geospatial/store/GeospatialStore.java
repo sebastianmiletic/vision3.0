@@ -12,7 +12,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GeospatialStore {
-  private final AtomicReference<Snapshot> snapshotRef = new AtomicReference<>(new Snapshot(List.of(), List.of(), List.of(), List.of(), Instant.now()));
+  private final AtomicReference<Snapshot> snapshotRef = new AtomicReference<>(new Snapshot(
+      List.of(),
+      List.of(),
+      List.of(),
+      List.of(),
+      List.of(),
+      Instant.now()
+  ));
 
   public Snapshot read() {
     return snapshotRef.get();
@@ -20,21 +27,61 @@ public class GeospatialStore {
 
   public void updateFlights(List<FlightTrack> flights) {
     Snapshot current = snapshotRef.get();
-    snapshotRef.set(new Snapshot(flights, current.earthquakes(), current.satellites(), current.radarFrames(), Instant.now()));
+    snapshotRef.set(new Snapshot(
+        flights,
+        current.militaryFlights(),
+        current.earthquakes(),
+        current.satellites(),
+        current.radarFrames(),
+        Instant.now()
+    ));
+  }
+
+  public void updateMilitaryFlights(List<FlightTrack> militaryFlights) {
+    Snapshot current = snapshotRef.get();
+    snapshotRef.set(new Snapshot(
+        current.flights(),
+        militaryFlights,
+        current.earthquakes(),
+        current.satellites(),
+        current.radarFrames(),
+        Instant.now()
+    ));
   }
 
   public void updateEarthquakes(List<EarthquakeEvent> earthquakes) {
     Snapshot current = snapshotRef.get();
-    snapshotRef.set(new Snapshot(current.flights(), earthquakes, current.satellites(), current.radarFrames(), Instant.now()));
+    snapshotRef.set(new Snapshot(
+        current.flights(),
+        current.militaryFlights(),
+        earthquakes,
+        current.satellites(),
+        current.radarFrames(),
+        Instant.now()
+    ));
   }
 
   public void updateSatellites(List<SatelliteState> satellites) {
     Snapshot current = snapshotRef.get();
-    snapshotRef.set(new Snapshot(current.flights(), current.earthquakes(), satellites, current.radarFrames(), Instant.now()));
+    snapshotRef.set(new Snapshot(
+        current.flights(),
+        current.militaryFlights(),
+        current.earthquakes(),
+        satellites,
+        current.radarFrames(),
+        Instant.now()
+    ));
   }
 
   public void updateRadarFrames(List<RadarFrame> frames) {
     Snapshot current = snapshotRef.get();
-    snapshotRef.set(new Snapshot(current.flights(), current.earthquakes(), current.satellites(), frames, Instant.now()));
+    snapshotRef.set(new Snapshot(
+        current.flights(),
+        current.militaryFlights(),
+        current.earthquakes(),
+        current.satellites(),
+        frames,
+        Instant.now()
+    ));
   }
 }

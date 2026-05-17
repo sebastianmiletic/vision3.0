@@ -12,7 +12,6 @@ export function mapFlightToEntityOptions(flight: FlightTrack) {
       outlineWidth: 1,
       pixelSize: 7,
       heightReference: HeightReference.NONE,
-      disableDepthTestDistance: Number.POSITIVE_INFINITY,
     },
     label: {
       text: flight.callsign || 'UNK',
@@ -23,7 +22,6 @@ export function mapFlightToEntityOptions(flight: FlightTrack) {
       style: LabelStyle.FILL_AND_OUTLINE,
       verticalOrigin: VerticalOrigin.TOP,
       pixelOffset: new Cartesian2(0, -14),
-      disableDepthTestDistance: Number.POSITIVE_INFINITY,
       showBackground: true,
       backgroundColor: Color.fromCssColorString('rgba(0,0,0,0.55)'),
       backgroundPadding: new Cartesian2(5, 3),

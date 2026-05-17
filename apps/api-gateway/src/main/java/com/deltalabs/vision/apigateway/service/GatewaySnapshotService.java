@@ -23,6 +23,10 @@ public class GatewaySnapshotService {
     return geospatialProxyClient.flights();
   }
 
+  public List<FlightTrack> militaryFlights() {
+    return geospatialProxyClient.militaryFlights();
+  }
+
   public List<EarthquakeEvent> earthquakes() {
     return geospatialProxyClient.earthquakes();
   }

@@ -160,10 +160,10 @@
                     <h4>CAMERA FOCUS</h4>
                 </header>
                 <div class="camera-focus-switch" role="group" aria-label="Camera focus mode">
-                    <button type="button" class="focus-mode-btn active" data-camera-focus="mouse">MOUSE</button>
-                    <button type="button" class="focus-mode-btn" data-camera-focus="crosshair">CROSSHAIR</button>
+                    <button type="button" class="focus-mode-btn" data-camera-focus="mouse">MOUSE</button>
+                    <button type="button" class="focus-mode-btn active" data-camera-focus="crosshair">CROSSHAIR</button>
                 </div>
-                <p class="camera-focus-hint" id="cameraFocusHint">Zoom/rotate follow mouse pointer.</p>
+                <p class="camera-focus-hint" id="cameraFocusHint">Zoom/rotate around center crosshair.</p>
             </section>
 
             <section class="control-card ultra-control hidden" id="ultraControl" aria-hidden="true">
@@ -207,18 +207,14 @@
                     <h4>WORLD TEXTURE</h4>
                 </header>
                 <div class="world-texture-grid" id="worldTexturePresetBar">
-                    <button class="chip world-texture-preset active" type="button" data-world-texture="default">DEFAULT</button>
-                    <button class="chip world-texture-preset" type="button" data-world-texture="blue-real">BLUE REAL</button>
-                    <button class="chip world-texture-preset" type="button" data-world-texture="true-color">TRUE COLOR</button>
-                    <button class="chip world-texture-preset" type="button" data-world-texture="night-lights">NIGHT LIGHTS</button>
-                    <button class="chip world-texture-preset" type="button" data-world-texture="topographic">TOPOGRAPHIC</button>
-                    <button class="chip world-texture-preset" type="button" data-world-texture="tropical">TROPICAL</button>
-                    <button class="chip world-texture-preset" type="button" data-world-texture="coastal">COASTAL</button>
-                    <button class="chip world-texture-preset" type="button" data-world-texture="orbital">ORBITAL</button>
+                    <button class="chip world-texture-preset active" type="button" data-world-texture="true-color">TRUE COLOR</button>
+                    <button class="chip world-texture-preset" type="button" data-world-texture="space-night">SPACE/NIGHT</button>
+                    <button class="chip world-texture-preset" type="button" data-world-texture="geoint-high-contrast">GEOINT HC</button>
+                    <button class="chip world-texture-preset" type="button" data-world-texture="polar-clarity">POLAR CLARITY</button>
+                    <button class="chip world-texture-preset" type="button" data-world-texture="infrared-scout">INFRARED</button>
                 </div>
                 <p class="cfg-note">Changes the live globe base imagery and ocean/atmosphere tint.</p>
             </section>
 
             <div class="side-text">BAND PAN BITS 11 LVL-A</div>
         </aside>
-

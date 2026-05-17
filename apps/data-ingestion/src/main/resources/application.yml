@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8084
 
 vision:
   polling:
@@ -18,8 +18,10 @@ vision:
       feed-url: ${VISION_INTEGRATIONS_CELESTRAK_FEED_URL:https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=json}
     rain-viewer:
       feed-url: ${VISION_INTEGRATIONS_RAINVIEWER_FEED_URL:https://api.rainviewer.com/public/weather-maps.json}
+    adsb-lol:
+      base-url: ${VISION_INTEGRATIONS_ADSBLOL_BASE_URL:https://api.adsb.lol}
     geospatial:
-      base-url: ${VISION_INTEGRATIONS_GEOSPATIAL_BASE_URL:http://localhost:8082}
+      base-url: ${VISION_INTEGRATIONS_GEOSPATIAL_BASE_URL:http://localhost:8083}
 
 logging:
   level:

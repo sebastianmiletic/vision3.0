@@ -8,6 +8,7 @@ public class IntegrationProperties {
   private final Usgs usgs = new Usgs();
   private final CelesTrak celesTrak = new CelesTrak();
   private final RainViewer rainViewer = new RainViewer();
+  private final AdsbLol adsbLol = new AdsbLol();
   private final Geospatial geospatial = new Geospatial();
 
   public OpenSky getOpenSky() {
@@ -24,6 +25,10 @@ public class IntegrationProperties {
 
   public RainViewer getRainViewer() {
     return rainViewer;
+  }
+
+  public AdsbLol getAdsbLol() {
+    return adsbLol;
   }
 
   public Geospatial getGeospatial() {
@@ -102,6 +107,18 @@ public class IntegrationProperties {
 
     public void setFeedUrl(String feedUrl) {
       this.feedUrl = feedUrl;
+    }
+  }
+
+  public static class AdsbLol {
+    private String baseUrl = "https://api.adsb.lol";
+
+    public String getBaseUrl() {
+      return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+      this.baseUrl = baseUrl;
     }
   }
 

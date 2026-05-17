@@ -32,6 +32,11 @@ public class GeospatialController {
     return service.flights();
   }
 
+  @GetMapping("/military-flights")
+  public List<FlightTrack> militaryFlights() {
+    return service.militaryFlights();
+  }
+
   @GetMapping("/earthquakes")
   public List<EarthquakeEvent> earthquakes() {
     return service.earthquakes();
@@ -50,6 +55,11 @@ public class GeospatialController {
   @PostMapping("/ingest/flights")
   public void ingestFlights(@RequestBody List<FlightTrack> flights) {
     service.ingestFlights(flights);
+  }
+
+  @PostMapping("/ingest/military-flights")
+  public void ingestMilitaryFlights(@RequestBody List<FlightTrack> flights) {
+    service.ingestMilitaryFlights(flights);
   }
 
   @PostMapping("/ingest/earthquakes")

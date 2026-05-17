@@ -22,7 +22,8 @@ public final class GeospatialModels {
   public record RadarFrame(String id, Instant timestamp, String tilePath, int colorScheme, String source) {
   }
 
-  public record Snapshot(List<FlightTrack> flights, List<EarthquakeEvent> earthquakes, List<SatelliteState> satellites,
+  public record Snapshot(List<FlightTrack> flights, List<FlightTrack> militaryFlights,
+                         List<EarthquakeEvent> earthquakes, List<SatelliteState> satellites,
                          List<RadarFrame> radarFrames, Instant timestamp) {
   }
 }

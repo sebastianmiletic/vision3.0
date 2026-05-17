@@ -1,6 +1,8 @@
 import { GlobeViewport } from '../globe/components/GlobeViewport';
+import { useCesiumViewer } from '../globe/hooks/useCesiumViewer';
 
 import { LegacyHtmlSection } from './components/LegacyHtmlSection';
+import { useLegacyShellRuntime } from './hooks/useLegacyShellRuntime';
 
 import bootHtml from './sections/boot.html?raw';
 import hudAndOverlaysHtml from './sections/hud-and-overlays.html?raw';
@@ -10,12 +12,15 @@ import bottomAndModalsHtml from './sections/bottom-and-modals.html?raw';
 import floatingPanelsHtml from './sections/floating-panels.html?raw';
 
 export function VisionLegacyShell() {
+  const viewerRef = useCesiumViewer('cesiumContainer');
+  useLegacyShellRuntime(viewerRef);
+
   return (
     <>
       <LegacyHtmlSection html={bootHtml} className="legacy-boot-root" />
 
       <main id="frame">
-        <GlobeViewport />
+        <GlobeViewport viewerRef={viewerRef} />
 
         <div className="pixel-noise" />
         <div className="scanlines" />

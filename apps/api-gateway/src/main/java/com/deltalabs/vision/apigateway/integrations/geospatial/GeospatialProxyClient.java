@@ -29,6 +29,11 @@ public class GeospatialProxyClient {
     });
   }
 
+  public List<FlightTrack> militaryFlights() {
+    return fetchList("/api/v1/geospatial/military-flights", new ParameterizedTypeReference<>() {
+    });
+  }
+
   public List<EarthquakeEvent> earthquakes() {
     return fetchList("/api/v1/geospatial/earthquakes", new ParameterizedTypeReference<>() {
     });
