@@ -20,6 +20,7 @@ type FocusInfo = {
   latitude: number;
   longitude: number;
 };
+const TRACKED_CARD_MIN_REFRESH_MS = 180;
 
 function getProperty(entity: Entity, key: string, now: JulianDate) {
   return entity.properties?.[key]?.getValue?.(now);
@@ -117,7 +118,7 @@ function updateCards(info: FocusInfo) {
   setText('flightInfoSource', info.sourceLabel.replace('SRC: ', ''));
 
   setHidden('focusAircraftCard', false);
-  setHidden('flightInfoPanel', false);
+  setHidden('flightInfoPanel', true);
   document.body.classList.add('focus-data-active');
 }
 
@@ -127,7 +128,40 @@ function releaseFocus(viewerRef: MutableRefObject<Viewer | null>) {
   document.body.classList.remove('focus-data-active');
   if (viewerRef.current) {
     viewerRef.current.trackedEntity = undefined;
+    viewerRef.current.dataSources.values.forEach((dataSource) => {
+      dataSource.entities.values.forEach((entity) => {
+        entity.show = true;
+      });
+    });
   }
+}
+
+function isolateFocusedEntity(viewer: Viewer, focused: Entity, layer: FocusLayer) {
+  const layerType = layer === 'satellite' ? 'satellite' : 'air';
+  viewer.dataSources.values.forEach((dataSource) => {
+    dataSource.entities.values.forEach((entity) => {
+      const id = String(entity.id ?? '');
+      const isSatelliteEntity = id.startsWith('sat-');
+      const isAirEntity = id.startsWith('flight-') || id.startsWith('mil-');
+
+      if (entity === focused) {
+        entity.show = true;
+        return;
+      }
+
+      if (layerType === 'satellite' && isSatelliteEntity) {
+        entity.show = false;
+        return;
+      }
+
+      if (layerType === 'air' && isAirEntity) {
+        entity.show = false;
+        return;
+      }
+
+      entity.show = true;
+    });
+  });
 }
 
 export function useLegacyShellFlightFocus(viewerRef: MutableRefObject<Viewer | null>) {
@@ -136,6 +170,8 @@ export function useLegacyShellFlightFocus(viewerRef: MutableRefObject<Viewer | n
     let attempts = 0;
     let onTickRef: ((clock: unknown) => void) | null = null;
     let mountedViewer: Viewer | null = null;
+    let lastCardRenderAt = 0;
+    let lastCardRenderKey = '';
 
     const setupPickHandler = window.setInterval(() => {
       if (handler || attempts > 20) {
@@ -156,6 +192,10 @@ export function useLegacyShellFlightFocus(viewerRef: MutableRefObject<Viewer | n
         const picked = viewer.scene.pick(position) as { id?: Entity } | undefined;
         const entity = picked?.id;
         if (!entity) {
+          if (viewer.trackedEntity) {
+            releaseFocus(viewerRef);
+            (window as Window & { __recenterEarth?: () => void }).__recenterEarth?.();
+          }
           return;
         }
 
@@ -166,6 +206,9 @@ export function useLegacyShellFlightFocus(viewerRef: MutableRefObject<Viewer | n
 
         viewer.trackedEntity = entity;
         updateCards(info);
+        lastCardRenderAt = Date.now();
+        lastCardRenderKey = `${info.id}|${info.latitude.toFixed(4)}|${info.longitude.toFixed(4)}|${info.altitudeLabel}|${info.speedLabel}|${info.headingLabel}|${info.sourceLabel}`;
+        isolateFocusedEntity(viewer, entity, info.layer);
       }, ScreenSpaceEventType.LEFT_CLICK);
 
       onTickRef = () => {
@@ -179,6 +222,14 @@ export function useLegacyShellFlightFocus(viewerRef: MutableRefObject<Viewer | n
           return;
         }
 
+        const nowMs = Date.now();
+        const nextKey = `${info.id}|${info.latitude.toFixed(4)}|${info.longitude.toFixed(4)}|${info.altitudeLabel}|${info.speedLabel}|${info.headingLabel}|${info.sourceLabel}`;
+        if (nextKey === lastCardRenderKey && nowMs - lastCardRenderAt < TRACKED_CARD_MIN_REFRESH_MS) {
+          return;
+        }
+
+        lastCardRenderAt = nowMs;
+        lastCardRenderKey = nextKey;
         updateCards(info);
       };
 

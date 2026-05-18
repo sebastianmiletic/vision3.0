@@ -44,6 +44,8 @@
     --crt-noise-strength: 0.5;
     --crt-jitter-strength: 0.45;
     --spotlight-strength: 1;
+    --world-tex-filter: saturate(1) contrast(1) brightness(1);
+    --google-2d-filter: none;
 
     --top-h: 94px;
     --dock-h: 74px;
@@ -111,6 +113,7 @@ body {
         saturate(calc(1.06 + var(--sh-nvg) * 2.2 + var(--sh-ultra) * 0.3 + var(--sh-spotlight) * 0.02 + var(--sh-custom) * 0.22 + var(--pix) * 0.03))
         contrast(calc(1.04 + var(--sh-nvg) * 0.14 + var(--sh-noir) * 0.3 + var(--sh-ultra) * 0.18 + var(--sh-spotlight) * 0.12 + var(--sh-custom) * 0.2 + var(--pix) * 0.03))
         brightness(calc(0.98 - var(--sh-nvg) * 0.06 - var(--sh-noir) * 0.1 + var(--sh-ultra) * 0.08 - var(--sh-spotlight) * 0.08 + var(--sh-custom) * 0.05))
+        var(--world-tex-filter, saturate(1) contrast(1) brightness(1))
         blur(calc(var(--scene-blur) * 1px));
     transform: scale(calc(1 + var(--dist) * 0.003));
 }
@@ -291,10 +294,8 @@ body.map-2d-active .spotlight-mask {
     z-index: 3;
     opacity: var(--noise);
     background-image:
-        radial-gradient(circle at 18% 18%, rgba(255, 154, 59, 0.09), transparent 24%),
-        radial-gradient(circle at 82% 28%, rgba(54, 133, 255, 0.08), transparent 28%),
-        radial-gradient(circle at 38% 84%, rgba(255, 73, 95, 0.06), transparent 22%),
-        repeating-radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 6px);
+        repeating-radial-gradient(circle at center, rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 5px),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 3px);
     mix-blend-mode: screen;
 }
 
@@ -647,4 +648,3 @@ body.vision-terminal-active .reticle {
         inset 0 0 0 1px rgba(38, 201, 255, 0.16),
         0 0 10px rgba(38, 201, 255, 0.22);
 }
-

@@ -166,6 +166,9 @@ export function useLegacyLocationSearch(viewerRef: MutableRefObject<Viewer | nul
       updateLocationInspectorFields(label, latitude, longitude);
 
       flyToLandmarkPerspective(viewer, latitude, longitude);
+      window.dispatchEvent(new CustomEvent('vision:location-search-resolved', {
+        detail: { label, latitude, longitude },
+      }));
 
       setText('searchStatus', `${label} · ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
       setText('keyLocationInspectStatus', `Inspected: ${label}`);

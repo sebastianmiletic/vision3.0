@@ -1,8 +1,9 @@
 import { setText } from './domUi';
 
 export const WORLD_TEXTURE_FILTERS: Record<string, string> = {
+  'hyperreal-earth': 'contrast(1.08) saturate(1.12) brightness(1.02)',
   'true-color': 'none',
-  'space-night': 'brightness(0.84) contrast(1.12) saturate(0.82)',
+  'space-night': 'brightness(0.18) contrast(1.46) saturate(0.06) grayscale(0.9)',
   'geoint-high-contrast': 'contrast(1.2) saturate(0.96) brightness(1.02)',
   'polar-clarity': 'saturate(0.82) brightness(1.08) contrast(1.06)',
   'infrared-scout': 'sepia(0.3) saturate(1.2) hue-rotate(-20deg) contrast(1.16) brightness(0.98)',

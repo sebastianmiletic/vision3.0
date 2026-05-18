@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { fetchMilitaryFlights } from '../../../services/integrations/militaryFlightsService';
+import { takeStartupMilitaryFlights } from '../../../services/startup/startupBootstrap';
 import { ensureMilitaryFlightDataSource, renderMilitaryFlights } from '../services/militaryFlightLayerPresenter';
 import { setMilitaryFlightUiStatus } from '../services/militaryFlightUiTelemetry';
 
@@ -9,6 +10,7 @@ import type { Viewer } from 'cesium';
 
 const POLL_INTERVAL_MS = 12000;
 const BOOTSTRAP_INTERVAL_MS = 1400;
+const EVENT_REFRESH_DEBOUNCE_MS = 220;
 
 function isLayerEnabled() {
   const toggle = document.querySelector<HTMLButtonElement>('[data-toggle="military"]');
@@ -23,6 +25,9 @@ export function useMilitaryFlightsLayer(viewerRef: MutableRefObject<Viewer | nul
     let alive = true;
     let refreshInFlight = false;
     let hasRenderedOnce = false;
+    let refreshQueuedTimer: number | null = null;
+    let lastEnabledState: boolean | null = null;
+    let startupMilitaryFlights = takeStartupMilitaryFlights();
 
     async function refresh() {
       if (refreshInFlight) {
@@ -37,21 +42,33 @@ export function useMilitaryFlightsLayer(viewerRef: MutableRefObject<Viewer | nul
       }
 
       try {
-        if (!isLayerEnabled()) {
-          const dataSource = await ensureMilitaryFlightDataSource(viewer);
-          dataSource.entities.removeAll();
+        const enabled = isLayerEnabled();
+        if (!enabled) {
+          if (lastEnabledState !== false) {
+            const dataSource = await ensureMilitaryFlightDataSource(viewer);
+            dataSource.entities.removeAll();
+            viewer.scene.requestRender();
+          }
+          lastEnabledState = false;
           setMilitaryFlightUiStatus('ADSB.lol military · disabled', 0);
           refreshInFlight = false;
           return;
         }
 
-        const flights = await fetchMilitaryFlights();
+        if (document.hidden) {
+          refreshInFlight = false;
+          return;
+        }
+
+        const flights = startupMilitaryFlights ?? await fetchMilitaryFlights();
+        startupMilitaryFlights = null;
         if (!alive) {
           refreshInFlight = false;
           return;
         }
 
         await renderMilitaryFlights(viewer, flights);
+        lastEnabledState = true;
         hasRenderedOnce = true;
       } catch (error) {
         setMilitaryFlightUiStatus('ADSB.lol military · waiting...', 0);
@@ -60,6 +77,19 @@ export function useMilitaryFlightsLayer(viewerRef: MutableRefObject<Viewer | nul
         refreshInFlight = false;
       }
     }
+
+    const queueRefresh = (delayMs = EVENT_REFRESH_DEBOUNCE_MS) => {
+      if (!alive) {
+        return;
+      }
+      if (refreshQueuedTimer !== null) {
+        window.clearTimeout(refreshQueuedTimer);
+      }
+      refreshQueuedTimer = window.setTimeout(() => {
+        refreshQueuedTimer = null;
+        void refresh();
+      }, delayMs);
+    };
 
     void refresh();
     const bootstrapIntervalId = window.setInterval(() => {
@@ -77,11 +107,11 @@ export function useMilitaryFlightsLayer(viewerRef: MutableRefObject<Viewer | nul
       if (!detail || detail.layer !== 'military') {
         return;
       }
-      void refresh();
+      queueRefresh();
     };
 
     const layerToggleChanged = () => {
-      void refresh();
+      queueRefresh();
     };
 
     window.addEventListener('vision:layer-config-changed', configChanged);
@@ -90,6 +120,9 @@ export function useMilitaryFlightsLayer(viewerRef: MutableRefObject<Viewer | nul
 
     return () => {
       alive = false;
+      if (refreshQueuedTimer !== null) {
+        window.clearTimeout(refreshQueuedTimer);
+      }
       window.clearInterval(bootstrapIntervalId);
       window.clearInterval(intervalId);
       window.removeEventListener('vision:layer-config-changed', configChanged);

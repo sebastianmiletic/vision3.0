@@ -7,6 +7,7 @@ const ADDON_PANEL_MAP: Record<string, string> = {
   'place-inspector': 'placeInspectorPanel',
   'vzn-terminal': 'vznTerminalPanel',
   'metadata-spoofing': 'metadataSpoofingPanel',
+  'static-profiling': 'staticProfilingPanel',
   'cctv-monitor': 'cctvMonitorPanel',
 };
 
@@ -15,6 +16,7 @@ const CLOSE_BUTTON_IDS = new Set([
   'placeInspectorBackBtn',
   'vznTerminalBackBtn',
   'metadataSpoofingBackBtn',
+  'staticProfilingBackBtn',
   'cctvMonitorBackBtn',
 ]);
 

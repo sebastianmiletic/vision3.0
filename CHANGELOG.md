@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.2.13 - 2026-05-18
+
+- Satellites runtime stabilization and validation:
+  - verified live satellite data path on `localhost:8081` (`/api/v1/geospatial/satellites`)
+  - advanced satellite mode remains in Satellite CFG (not as a separate layer item).
+- Focus-mode behavior upgrades:
+  - clicking empty globe while focused now releases focus and recenters Earth
+  - focused entity isolation now hides surrounding air entities when focusing flights/military.
+- CFG UX and scope cleanup:
+  - removed separate `Advanced Satellites` layer row; moved advanced toggle into Satellite CFG
+  - `Show Orbit` now satellite-only in CFG
+  - satellite outline controls now satellite-only in CFG
+  - compact controls (`marker size`, `opacity`, durations, etc.) kept in 2-column compact slider rows.
+- Zoom control tuning while focused:
+  - wheel zoom behavior now uses focused-aware scaling and bounded zoom amounts in crosshair mode.
+
+## 0.2.12 - 2026-05-17
+
+- Added new layer behavior controls for dynamic motion visualization:
+  - `showTrail` + trail duration (minutes)
+  - `showPath` + lead duration (minutes)
+  - `showOrbit` + orbit duration (minutes, satellite-focused)
+- Extended per-layer CFG panel so these controls are configurable live per layer.
+- Added flight and military path/trail rendering using Cesium dynamic path + projected polyline.
+- Added satellite orbit/path rendering option with configurable duration.
+- Updated focus interaction:
+  - clicking empty globe space while tracking now exits focus and recenters Earth
+  - right-side flight info panel remains hidden; focus info is presented via the bottom-center card only.
+
 ## 0.2.11 - 2026-05-17
 
 - Added full military flight pipeline powered by ADSB.lol:

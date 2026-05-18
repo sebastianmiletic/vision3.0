@@ -4,6 +4,8 @@ server:
 vision:
   geospatial:
     base-url: ${VISION_GEOSPATIAL_BASE_URL:http://localhost:8083}
+  celestrak:
+    feed-url: ${VISION_CELESTRAK_FEED_URL:https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=json}
   webcams:
     base-url: ${VISION_WEBCAMS_BASE_URL:https://api.windy.com}
     api-key: ${VISION_WEBCAMS_API_KEY:}

@@ -74,6 +74,9 @@ All use shared fetch helper `services/apiClient.ts`.
   - outline enabled/disabled
   - outline color
   - outline width
+  - trail toggle + trail duration (minutes)
+  - path toggle + lead duration (minutes)
+  - orbit toggle + duration (minutes)
   - label visibility
 - Applying changes emits `vision:layer-config-changed`; active layer hooks re-render immediately.
 
@@ -92,6 +95,8 @@ Shell controls are split into dedicated hooks instead of a single monolithic run
   - Cesium entity click pick handler
   - focus card and detail panel binding for flights, military flights, and satellites
   - continuous focused-entity data refresh while tracked
+  - click-off behavior recenters Earth and exits tracked focus
+  - right-side flight panel stays hidden; bottom-center focus card is the active info surface
 - `features/legacy-shell/hooks/useLegacyLayerConfigPanel.ts`
   - reusable CFG panel for all layer rows
 - `features/legacy-shell/hooks/useLegacyLocationSearch.ts`

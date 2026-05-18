@@ -14,7 +14,7 @@ export function useLegacyShellUi() {
     const accentButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-accent-preset]'));
     const worldButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-world-texture]'));
     const DEFAULT_CAMERA_FOCUS = 'crosshair';
-    const DEFAULT_WORLD_TEXTURE = 'true-color';
+    const DEFAULT_WORLD_TEXTURE = 'hyperreal-earth';
 
     const setToggleState = (node: HTMLButtonElement, enabled: boolean) => {
       node.classList.toggle('on', enabled);
@@ -54,8 +54,9 @@ export function useLegacyShellUi() {
       const preset = hasPresetButton ? presetValue : DEFAULT_WORLD_TEXTURE;
       worldButtons.forEach((node) => node.classList.toggle('active', node.getAttribute('data-world-texture') === preset));
       const filter = WORLD_TEXTURE_FILTERS[preset] ?? WORLD_TEXTURE_FILTERS[DEFAULT_WORLD_TEXTURE] ?? 'saturate(1)';
-      document.documentElement.style.setProperty('--world-tex-filter', filter);
+      document.documentElement.style.setProperty('--world-tex-filter', 'none');
       document.documentElement.style.setProperty('--google-2d-filter', filter);
+      window.__applyWorldTexturePreset?.(preset);
     };
 
     const onClick = (event: MouseEvent) => {

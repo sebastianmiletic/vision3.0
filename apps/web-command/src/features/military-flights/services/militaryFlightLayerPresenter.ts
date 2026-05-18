@@ -2,6 +2,7 @@ import {
   BillboardGraphics,
   Cartesian2,
   Cartesian3,
+  ColorMaterialProperty,
   ConstantPositionProperty,
   CustomDataSource,
   DistanceDisplayCondition,
@@ -11,7 +12,9 @@ import {
   LabelGraphics,
   LabelStyle,
   Math as CesiumMath,
+  PathGraphics,
   PointGraphics,
+  PolylineGraphics,
   PropertyBag,
   SampledPositionProperty,
   VerticalOrigin,
@@ -31,6 +34,9 @@ const ICON_MAX_DISTANCE_METERS = 65_000_000;
 const LABEL_MAX_DISTANCE_METERS = 12_000_000;
 
 type VisionEntity = Entity & { __visionVisualSig?: string };
+type TrackPoint = { time: JulianDate; position: Cartesian3; latitude: number; longitude: number; altitudeMeters: number };
+
+const historyByMilitaryId = new Map<string, TrackPoint[]>();
 
 function createPropertyBag(flight: FlightTrack) {
   return new PropertyBag({
@@ -54,6 +60,28 @@ function isValidCoordinates(latitude: number, longitude: number): boolean {
     && longitude <= 180;
 }
 
+function destinationFrom(latDeg: number, lonDeg: number, headingDeg: number, distanceMeters: number) {
+  const earthRadiusMeters = 6_371_000;
+  const angularDistance = distanceMeters / earthRadiusMeters;
+  const latRad = CesiumMath.toRadians(latDeg);
+  const lonRad = CesiumMath.toRadians(lonDeg);
+  const bearing = CesiumMath.toRadians(headingDeg);
+
+  const nextLat = Math.asin(
+    Math.sin(latRad) * Math.cos(angularDistance)
+      + Math.cos(latRad) * Math.sin(angularDistance) * Math.cos(bearing),
+  );
+  const nextLon = lonRad + Math.atan2(
+    Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(latRad),
+    Math.cos(angularDistance) - Math.sin(latRad) * Math.sin(nextLat),
+  );
+
+  return {
+    latitude: CesiumMath.toDegrees(nextLat),
+    longitude: CesiumMath.toDegrees(nextLon),
+  };
+}
+
 function applyPosition(entity: Entity, flight: FlightTrack) {
   if (!isValidCoordinates(flight.latitude, flight.longitude)) {
     return;
@@ -62,23 +90,57 @@ function applyPosition(entity: Entity, flight: FlightTrack) {
   const nextPosition = Cartesian3.fromDegrees(flight.longitude, flight.latitude, Math.max(flight.altitudeMeters, 12));
   const now = JulianDate.now();
   const currentPosition = entity.position?.getValue(now);
+  const config = getLayerVisualConfig('military');
+  const historyTtlSeconds = Math.max(120, config.trailMinutes * 60 + 120);
+  const history = historyByMilitaryId.get(flight.id) ?? [];
 
   if (currentPosition && Cartesian3.distance(currentPosition, nextPosition) > MAX_SMOOTH_DISTANCE_METERS) {
+    history.length = 0;
     entity.position = new ConstantPositionProperty(nextPosition);
+    history.push({
+      time: now,
+      position: nextPosition,
+      latitude: flight.latitude,
+      longitude: flight.longitude,
+      altitudeMeters: Math.max(flight.altitudeMeters, 12),
+    });
+    historyByMilitaryId.set(flight.id, history);
     return;
   }
+
+  history.push({
+    time: now,
+    position: nextPosition,
+    latitude: flight.latitude,
+    longitude: flight.longitude,
+    altitudeMeters: Math.max(flight.altitudeMeters, 12),
+  });
+  const cutoff = JulianDate.addSeconds(now, -historyTtlSeconds, new JulianDate());
+  const pruned = history.filter((point) => JulianDate.greaterThanOrEquals(point.time, cutoff));
+  historyByMilitaryId.set(flight.id, pruned);
 
   const sampled = new SampledPositionProperty();
   sampled.forwardExtrapolationType = ExtrapolationType.HOLD;
   sampled.backwardExtrapolationType = ExtrapolationType.HOLD;
-  sampled.addSample(now, currentPosition ?? nextPosition);
+  pruned.forEach((point) => sampled.addSample(point.time, point.position));
   sampled.addSample(JulianDate.addSeconds(now, SMOOTH_SECONDS, new JulianDate()), nextPosition);
+
+  if (config.showPath) {
+    const leadSeconds = config.pathLeadMinutes * 60;
+    const distanceMeters = Math.max(0, flight.speedKnots) * 0.514444 * leadSeconds;
+    const projected = destinationFrom(flight.latitude, flight.longitude, flight.headingDegrees || 0, distanceMeters);
+    if (isValidCoordinates(projected.latitude, projected.longitude)) {
+      const projectedPosition = Cartesian3.fromDegrees(projected.longitude, projected.latitude, Math.max(flight.altitudeMeters, 12));
+      sampled.addSample(JulianDate.addSeconds(now, leadSeconds, new JulianDate()), projectedPosition);
+    }
+  }
+
   entity.position = sampled;
 }
 
 function applyVisuals(entity: Entity, flight: FlightTrack) {
   const config = getLayerVisualConfig('military');
-  const sig = `${config.color}|${config.iconPreset}|${config.markerSize}|${config.showLabel}|${config.outlineEnabled}|${config.outlineColor}|${config.outlineWidth}|${config.markerOpacity}|${flight.callsign || 'UNK'}`;
+  const sig = `${config.color}|${config.iconPreset}|${config.markerSize}|${config.showLabel}|${config.outlineEnabled}|${config.outlineColor}|${config.outlineWidth}|${config.markerOpacity}|${config.showTrail}|${config.trailMinutes}|${config.showPath}|${config.pathLeadMinutes}|${flight.callsign || 'UNK'}`;
   const visionEntity = entity as VisionEntity;
   if (visionEntity.__visionVisualSig === sig) {
     return;
@@ -131,6 +193,41 @@ function applyVisuals(entity: Entity, flight: FlightTrack) {
         distanceDisplayCondition: new DistanceDisplayCondition(0, LABEL_MAX_DISTANCE_METERS),
       })
     : undefined;
+
+  if (config.showTrail || config.showPath) {
+    entity.path = new PathGraphics({
+      width: Math.max(1, config.outlineWidth + 1),
+      leadTime: config.showPath ? config.pathLeadMinutes * 60 : 0,
+      trailTime: config.showTrail ? config.trailMinutes * 60 : 0,
+      resolution: 10,
+      material: new ColorMaterialProperty(buildCesiumColor(config.color, Math.min(0.7, config.markerOpacity))),
+      distanceDisplayCondition: new DistanceDisplayCondition(0, ICON_MAX_DISTANCE_METERS),
+    });
+  } else {
+    entity.path = undefined;
+  }
+
+  if (config.showPath) {
+    const distanceMeters = Math.max(0, flight.speedKnots) * 0.514444 * config.pathLeadMinutes * 60;
+    const projected = destinationFrom(flight.latitude, flight.longitude, flight.headingDegrees || 0, distanceMeters);
+    if (isValidCoordinates(projected.latitude, projected.longitude)) {
+      const history = historyByMilitaryId.get(flight.id) ?? [];
+      const started = history[0];
+      const startPosition = started
+        ? Cartesian3.fromDegrees(started.longitude, started.latitude, started.altitudeMeters)
+        : Cartesian3.fromDegrees(flight.longitude, flight.latitude, Math.max(flight.altitudeMeters, 12));
+      const currentPosition = Cartesian3.fromDegrees(flight.longitude, flight.latitude, Math.max(flight.altitudeMeters, 12));
+      const projectedPosition = Cartesian3.fromDegrees(projected.longitude, projected.latitude, Math.max(flight.altitudeMeters, 12));
+      entity.polyline = new PolylineGraphics({
+        positions: [startPosition, currentPosition, projectedPosition],
+        width: Math.max(1, config.outlineWidth + 1),
+        material: new ColorMaterialProperty(buildCesiumColor(config.color, 0.46)),
+        distanceDisplayCondition: new DistanceDisplayCondition(0, ICON_MAX_DISTANCE_METERS),
+      });
+    }
+  } else {
+    entity.polyline = undefined;
+  }
 }
 
 function updateEntity(entity: Entity, flight: FlightTrack) {
@@ -184,9 +281,19 @@ export async function renderMilitaryFlights(viewer: Viewer, flights: FlightTrack
     dataSource.entities.add(createEntity(flight));
   });
 
-  dataSource.entities.values
-    .filter((entity) => !usedIds.has(String(entity.id)))
-    .forEach((entity) => dataSource.entities.remove(entity));
+  for (let index = dataSource.entities.values.length - 1; index >= 0; index -= 1) {
+    const entity = dataSource.entities.values[index];
+    if (!entity) {
+      continue;
+    }
+    const entityId = String(entity.id);
+    if (usedIds.has(entityId)) {
+      continue;
+    }
+    historyByMilitaryId.delete(entityId);
+    dataSource.entities.remove(entity);
+  }
 
   setMilitaryFlightUiStatus(`ADSB.lol military · ${limited.length > 0 ? 'live' : 'waiting...'}`, limited.length);
+  viewer.scene.requestRender();
 }

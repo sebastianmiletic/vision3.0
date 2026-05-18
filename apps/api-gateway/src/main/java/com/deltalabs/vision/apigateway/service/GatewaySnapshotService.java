@@ -5,6 +5,7 @@ import com.deltalabs.vision.apigateway.domain.GeospatialRecords.FlightTrack;
 import com.deltalabs.vision.apigateway.domain.GeospatialRecords.MarketQuote;
 import com.deltalabs.vision.apigateway.domain.GeospatialRecords.RadarFrame;
 import com.deltalabs.vision.apigateway.domain.GeospatialRecords.SatelliteState;
+import com.deltalabs.vision.apigateway.integrations.celestrak.CelesTrakLiveClient;
 import com.deltalabs.vision.apigateway.integrations.geospatial.GeospatialProxyClient;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class GatewaySnapshotService {
   private final GeospatialProxyClient geospatialProxyClient;
+  private final CelesTrakLiveClient celesTrakLiveClient;
   private final MarketQuoteService marketQuoteService;
 
-  public GatewaySnapshotService(GeospatialProxyClient geospatialProxyClient, MarketQuoteService marketQuoteService) {
+  public GatewaySnapshotService(
+      GeospatialProxyClient geospatialProxyClient,
+      CelesTrakLiveClient celesTrakLiveClient,
+      MarketQuoteService marketQuoteService
+  ) {
     this.geospatialProxyClient = geospatialProxyClient;
+    this.celesTrakLiveClient = celesTrakLiveClient;
     this.marketQuoteService = marketQuoteService;
   }
 
@@ -32,7 +39,11 @@ public class GatewaySnapshotService {
   }
 
   public List<SatelliteState> satellites() {
-    return geospatialProxyClient.satellites();
+    List<SatelliteState> proxied = geospatialProxyClient.satellites();
+    if (!proxied.isEmpty()) {
+      return proxied;
+    }
+    return celesTrakLiveClient.satellites();
   }
 
   public List<RadarFrame> radarFrames() {

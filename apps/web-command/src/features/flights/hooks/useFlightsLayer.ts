@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { fetchFlights } from '../../../services/integrations/flightsService';
+import { takeStartupFlights } from '../../../services/startup/startupBootstrap';
 import { ensureFlightDataSource, renderFlights } from '../services/flightLayerPresenter';
 import { setFlightUiStatus } from '../services/flightUiTelemetry';
 
@@ -9,6 +10,7 @@ import type { Viewer } from 'cesium';
 
 const POLL_INTERVAL_MS = 12000;
 const BOOTSTRAP_INTERVAL_MS = 1400;
+const EVENT_REFRESH_DEBOUNCE_MS = 220;
 
 function isFlightsLayerEnabled() {
   const toggle = document.querySelector<HTMLButtonElement>('[data-toggle="flights"]');
@@ -24,6 +26,9 @@ export function useFlightsLayer(viewerRef: MutableRefObject<Viewer | null>) {
     let alive = true;
     let refreshInFlight = false;
     let hasRenderedOnce = false;
+    let refreshQueuedTimer: number | null = null;
+    let lastEnabledState: boolean | null = null;
+    let startupFlights = takeStartupFlights();
 
     async function refresh() {
       if (refreshInFlight) {
@@ -38,21 +43,33 @@ export function useFlightsLayer(viewerRef: MutableRefObject<Viewer | null>) {
       }
 
       try {
-        if (!isFlightsLayerEnabled()) {
-          const dataSource = await ensureFlightDataSource(viewer);
-          dataSource.entities.removeAll();
+        const enabled = isFlightsLayerEnabled();
+        if (!enabled) {
+          if (lastEnabledState !== false) {
+            const dataSource = await ensureFlightDataSource(viewer);
+            dataSource.entities.removeAll();
+            viewer.scene.requestRender();
+          }
+          lastEnabledState = false;
           setFlightUiStatus('OpenSky network · disabled', 0);
           refreshInFlight = false;
           return;
         }
 
-        const flights = await fetchFlights();
+        if (document.hidden) {
+          refreshInFlight = false;
+          return;
+        }
+
+        const flights = startupFlights ?? await fetchFlights();
+        startupFlights = null;
         if (!alive) {
           refreshInFlight = false;
           return;
         }
 
         await renderFlights(viewer, flights);
+        lastEnabledState = true;
         hasRenderedOnce = true;
       } catch (error) {
         setFlightUiStatus('OpenSky network · waiting...', 0);
@@ -61,6 +78,19 @@ export function useFlightsLayer(viewerRef: MutableRefObject<Viewer | null>) {
         refreshInFlight = false;
       }
     }
+
+    const queueRefresh = (delayMs = EVENT_REFRESH_DEBOUNCE_MS) => {
+      if (!alive) {
+        return;
+      }
+      if (refreshQueuedTimer !== null) {
+        window.clearTimeout(refreshQueuedTimer);
+      }
+      refreshQueuedTimer = window.setTimeout(() => {
+        refreshQueuedTimer = null;
+        void refresh();
+      }, delayMs);
+    };
 
     void refresh();
     const bootstrapIntervalId = window.setInterval(() => {
@@ -79,11 +109,11 @@ export function useFlightsLayer(viewerRef: MutableRefObject<Viewer | null>) {
         return;
       }
 
-      void refresh();
+      queueRefresh();
     };
 
     const layerToggleChanged = () => {
-      void refresh();
+      queueRefresh();
     };
 
     window.addEventListener('vision:layer-config-changed', configChanged);
@@ -92,6 +122,9 @@ export function useFlightsLayer(viewerRef: MutableRefObject<Viewer | null>) {
 
     return () => {
       alive = false;
+      if (refreshQueuedTimer !== null) {
+        window.clearTimeout(refreshQueuedTimer);
+      }
       window.clearInterval(bootstrapIntervalId);
       window.clearInterval(intervalId);
       window.removeEventListener('vision:layer-config-changed', configChanged);

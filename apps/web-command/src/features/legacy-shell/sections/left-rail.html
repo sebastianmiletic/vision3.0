@@ -111,6 +111,7 @@
                                     </div>
                                 </div>
                             </article>
+
                         </div>
                     </section>
 
@@ -144,20 +145,6 @@
                                     <div class="layer-controls">
                                         <button class="layer-cfg-btn" data-config="military">CFG</button>
                                         <button class="toggle on" data-toggle="military">ON</button>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <article class="layer-item" data-layer="trains">
-                                <div>
-                                    <h3>🚆 Trains</h3>
-                                    <p id="trainStatus">Global rail network · standby</p>
-                                </div>
-                                <div class="layer-right">
-                                    <span class="count" id="trainCount">0</span>
-                                    <div class="layer-controls">
-                                        <button class="layer-cfg-btn" data-config="trains">CFG</button>
-                                        <button class="toggle on" data-toggle="trains">ON</button>
                                     </div>
                                 </div>
                             </article>
@@ -200,6 +187,20 @@
                                     <div class="layer-controls">
                                         <button class="layer-cfg-btn" data-config="advancedSatellites">CFG</button>
                                         <button class="toggle on" data-toggle="advancedSatellites">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="layer-item" data-layer="trains">
+                                <div>
+                                    <h3>🚆 Trains</h3>
+                                    <p id="trainStatus">Global rail network · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="trainCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="trains">CFG</button>
+                                        <button class="toggle on" data-toggle="trains">ON</button>
                                     </div>
                                 </div>
                             </article>
@@ -560,6 +561,20 @@
                                 </div>
                             </article>
 
+                            <article class="layer-item" data-layer="bordersLabels">
+                                <div>
+                                    <h3>🗺 Borders + Labels</h3>
+                                    <p id="bordersLabelsStatus">Natural Earth borders · standby</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="bordersLabelsCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-config="bordersLabels">CFG</button>
+                                        <button class="toggle on" data-toggle="bordersLabels">ON</button>
+                                    </div>
+                                </div>
+                            </article>
+
                             <article class="layer-item" data-layer="pipelines">
                                 <div>
                                     <h3>🛢 Pipelines</h3>
@@ -759,6 +774,18 @@
                                     </div>
                                 </div>
                             </article>
+                            <article class="layer-item addon-layer-item" data-addon-open="static-profiling">
+                                <div>
+                                    <h3>🧬 Static Profiling</h3>
+                                    <p id="staticProfilingAddonStatus">People gallery + neutral 3D connection network</p>
+                                </div>
+                                <div class="layer-right">
+                                    <span class="count" id="staticProfilingAddonCount">0</span>
+                                    <div class="layer-controls">
+                                        <button class="layer-cfg-btn" data-addon-open="static-profiling">OPEN</button>
+                                    </div>
+                                </div>
+                            </article>
                             <article class="layer-item addon-layer-item" data-addon-open="cctv-monitor">
                                 <div>
                                     <h3>📹 Public CCTV Monitor</h3>
@@ -889,6 +916,101 @@
                         <h3>RAW JSON</h3>
                     </header>
                     <pre id="metadataRawJson">No metadata parsed yet.</pre>
+                </section>
+            </section>
+
+            <section class="sub-panel static-profiling-addon-panel hidden" id="staticProfilingPanel" aria-hidden="true">
+                <header class="static-profiling-addon-head">
+                    <div>
+                        <h2>STATIC PROFILING</h2>
+                        <p>Gallery of people profiles with auto-updating age/grade and a neutral 3D relationship network.</p>
+                    </div>
+                    <button class="tiny-btn" id="staticProfilingBackBtn" type="button">×</button>
+                </header>
+
+                <div class="static-profiling-toolbar">
+                    <input id="staticProfilingSearchInput" type="text" placeholder="Search person, sport, grade, address...">
+                    <button class="chip" id="staticProfilingAddBtn" type="button">ADD PERSON</button>
+                </div>
+                <p class="static-profiling-status" id="staticProfilingStatus">Loading profiles...</p>
+
+                <section class="static-profiling-network-panel">
+                    <header>
+                        <h3>NEUTRAL NETWORK (3D)</h3>
+                        <p><span id="staticProfilingPersonCount">0</span> people · <span id="staticProfilingConnectionCount">0</span> links</p>
+                    </header>
+                    <canvas id="staticProfilingNetworkCanvas" width="520" height="240" aria-label="3D connection network graph"></canvas>
+                </section>
+
+                <section class="static-profiling-gallery-panel">
+                    <header>
+                        <h3>GALLERY</h3>
+                    </header>
+                    <div class="static-profiling-gallery" id="staticProfilingGallery"></div>
+                </section>
+
+                <section class="static-profiling-detail-panel">
+                    <header>
+                        <h3>PROFILE DETAIL</h3>
+                    </header>
+                    <div class="static-profiling-detail" id="staticProfilingDetail">Select a person to view full profile data.</div>
+                </section>
+
+                <section class="static-profiling-modal hidden" id="staticProfilingFormModal" aria-hidden="true">
+                    <header>
+                        <h3>ADD PERSON</h3>
+                        <button class="tiny-btn" id="staticProfilingFormCloseBtn" type="button">×</button>
+                    </header>
+                    <form class="static-profiling-form" id="staticProfilingForm">
+                        <label>
+                            Full Name
+                            <input id="staticProfilingNameInput" name="fullName" type="text" maxlength="80" required>
+                        </label>
+                        <label>
+                            Date Of Birth
+                            <input id="staticProfilingBirthDateInput" name="birthDate" type="date" required>
+                        </label>
+                        <label>
+                            Grade (base)
+                            <input id="staticProfilingGradeInput" name="gradeBase" type="number" min="1" max="20" required>
+                        </label>
+                        <label>
+                            Grade Base Year
+                            <input id="staticProfilingGradeYearInput" name="gradeBaseYear" type="number" min="1990" max="2100" required>
+                        </label>
+                        <label>
+                            Sport
+                            <input id="staticProfilingSportInput" name="sport" type="text" maxlength="60" required>
+                        </label>
+                        <label>
+                            Eye Colour
+                            <input id="staticProfilingEyeColorInput" name="eyeColor" type="text" maxlength="60" required>
+                        </label>
+                        <label>
+                            Address
+                            <input id="staticProfilingAddressInput" name="address" type="text" maxlength="140" required>
+                        </label>
+                        <label>
+                            Connection Names (comma separated)
+                            <input id="staticProfilingConnectionsInput" name="connectionNames" type="text" maxlength="240" placeholder="Example: Alex Stone, Mia Patel">
+                        </label>
+                        <label>
+                            Additional Info (one per line: Key: Value)
+                            <textarea id="staticProfilingExtraInfoInput" name="extraInfo" rows="4" placeholder="Club: Robotics&#10;Homeroom: B12"></textarea>
+                        </label>
+                        <label>
+                            Notes
+                            <textarea id="staticProfilingNotesInput" name="notes" rows="3" maxlength="400" placeholder="Any extra profile information"></textarea>
+                        </label>
+                        <label>
+                            Photo
+                            <input id="staticProfilingPhotoInput" name="photo" type="file" accept="image/*">
+                        </label>
+                        <div class="static-profiling-form-actions">
+                            <button class="chip" id="staticProfilingCancelBtn" type="button">CANCEL</button>
+                            <button class="chip" type="submit">SAVE PROFILE</button>
+                        </div>
+                    </form>
                 </section>
             </section>
 

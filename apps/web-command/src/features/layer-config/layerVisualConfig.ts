@@ -9,6 +9,13 @@ export type LayerVisualConfig = {
   outlineEnabled: boolean;
   outlineColor: string;
   outlineWidth: number;
+  showTrail: boolean;
+  trailMinutes: number;
+  showPath: boolean;
+  pathLeadMinutes: number;
+  showOrbit: boolean;
+  orbitMinutes: number;
+  advancedSatellites: boolean;
   showLabel: boolean;
 };
 
@@ -21,6 +28,13 @@ const DEFAULT_CONFIG: LayerVisualConfig = {
   outlineEnabled: true,
   outlineColor: '#000000',
   outlineWidth: 1,
+  showTrail: false,
+  trailMinutes: 20,
+  showPath: false,
+  pathLeadMinutes: 12,
+  showOrbit: false,
+  orbitMinutes: 45,
+  advancedSatellites: false,
   showLabel: false,
 };
 
@@ -70,8 +84,110 @@ function normalizeConfig(partial: Partial<LayerVisualConfig>): LayerVisualConfig
     outlineEnabled: partial.outlineEnabled ?? DEFAULT_CONFIG.outlineEnabled,
     outlineColor: normalizeOutlineColor(partial.outlineColor),
     outlineWidth: Math.min(6, Math.max(0, Number(partial.outlineWidth ?? DEFAULT_CONFIG.outlineWidth))),
+    showTrail: partial.showTrail ?? DEFAULT_CONFIG.showTrail,
+    trailMinutes: Math.min(240, Math.max(1, Number(partial.trailMinutes ?? DEFAULT_CONFIG.trailMinutes))),
+    showPath: partial.showPath ?? DEFAULT_CONFIG.showPath,
+    pathLeadMinutes: Math.min(240, Math.max(1, Number(partial.pathLeadMinutes ?? DEFAULT_CONFIG.pathLeadMinutes))),
+    showOrbit: partial.showOrbit ?? DEFAULT_CONFIG.showOrbit,
+    orbitMinutes: Math.min(240, Math.max(1, Number(partial.orbitMinutes ?? DEFAULT_CONFIG.orbitMinutes))),
+    advancedSatellites: partial.advancedSatellites ?? DEFAULT_CONFIG.advancedSatellites,
     showLabel: partial.showLabel ?? DEFAULT_CONFIG.showLabel,
   };
+}
+
+function seededConfigForLayer(layer: string): Partial<LayerVisualConfig> {
+  switch (layer) {
+    case 'flights':
+      return {
+        iconPreset: 'plane',
+        maxEntities: 520,
+        markerSize: 7,
+        markerOpacity: 0.96,
+        outlineEnabled: true,
+        outlineColor: '#08101a',
+        outlineWidth: 1.6,
+        showTrail: true,
+        trailMinutes: 25,
+        showPath: true,
+        pathLeadMinutes: 16,
+        showOrbit: false,
+        orbitMinutes: 45,
+        advancedSatellites: false,
+        showLabel: true,
+      };
+    case 'military':
+      return {
+        iconPreset: 'plane',
+        maxEntities: 320,
+        markerSize: 7,
+        markerOpacity: 0.95,
+        outlineEnabled: true,
+        outlineColor: '#0a111f',
+        outlineWidth: 1.8,
+        showTrail: true,
+        trailMinutes: 30,
+        showPath: true,
+        pathLeadMinutes: 20,
+        showOrbit: false,
+        orbitMinutes: 45,
+        advancedSatellites: false,
+        showLabel: true,
+      };
+    case 'satellites':
+      return {
+        iconPreset: 'satellite',
+        maxEntities: 180,
+        markerSize: 7,
+        markerOpacity: 0.94,
+        outlineEnabled: true,
+        outlineColor: '#000000',
+        outlineWidth: 1,
+        showTrail: false,
+        trailMinutes: 30,
+        showPath: false,
+        pathLeadMinutes: 35,
+        showOrbit: true,
+        orbitMinutes: 45,
+        advancedSatellites: false,
+        showLabel: true,
+      };
+    case 'borderslabels':
+      return {
+        iconPreset: 'dot',
+        maxEntities: 420,
+        markerSize: 6,
+        markerOpacity: 0.96,
+        outlineEnabled: true,
+        outlineColor: '#08101a',
+        outlineWidth: 2.6,
+        showTrail: false,
+        trailMinutes: 20,
+        showPath: false,
+        pathLeadMinutes: 12,
+        showOrbit: false,
+        orbitMinutes: 45,
+        advancedSatellites: false,
+        showLabel: true,
+      };
+    default:
+      return {
+        iconPreset: layer.includes('sat') ? 'satellite' : layer.includes('flight') || layer.includes('military') ? 'plane' : 'dot',
+        maxEntities: 220,
+        markerSize: 6,
+        markerOpacity: 0.94,
+        outlineEnabled: false,
+        outlineColor: '#000000',
+        outlineWidth: 0,
+        showTrail: false,
+        trailMinutes: 20,
+        showPath: false,
+        pathLeadMinutes: 12,
+        showOrbit: false,
+        orbitMinutes: 45,
+        advancedSatellites: false,
+        showLabel: false,
+      };
+  }
 }
 
 export function getLayerVisualConfig(layer: string): LayerVisualConfig {
@@ -81,12 +197,7 @@ export function getLayerVisualConfig(layer: string): LayerVisualConfig {
   }
 
   const layerLower = layer.toLowerCase();
-  const seeded = normalizeConfig({
-    iconPreset: layerLower.includes('sat') ? 'satellite' : layerLower.includes('flight') || layerLower.includes('military') ? 'plane' : 'dot',
-    maxEntities: layerLower.includes('sat') ? 180 : layerLower.includes('flight') ? 500 : DEFAULT_CONFIG.maxEntities,
-    markerSize: layerLower.includes('sat') ? 7 : DEFAULT_CONFIG.markerSize,
-    showLabel: false,
-  });
+  const seeded = normalizeConfig(seededConfigForLayer(layerLower));
 
   layerConfigStore.set(layer, seeded);
   return seeded;
