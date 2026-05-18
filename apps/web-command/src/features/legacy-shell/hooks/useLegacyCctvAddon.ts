@@ -145,6 +145,8 @@ export function useLegacyCctvAddon(viewerRef: MutableRefObject<Viewer | null>) {
     let activeCountry = '';
     let refreshTimer: number | null = null;
     let startupRetryTimer: number | null = null;
+    let isBootstrapped = false;
+    let initPromise: Promise<void> | null = null;
 
     const setStatus = (message: string) => {
       setText('cctvMonitorStatus', message);
@@ -391,6 +393,28 @@ export function useLegacyCctvAddon(viewerRef: MutableRefObject<Viewer | null>) {
       }
     };
 
+    const ensureInitialized = async () => {
+      if (isBootstrapped) {
+        return;
+      }
+      if (initPromise) {
+        await initPromise;
+        return;
+      }
+
+      initPromise = (async () => {
+        await loadCountries();
+        await loadCameras(true);
+        isBootstrapped = countries.length > 0 || cameras.length > 0;
+      })();
+
+      try {
+        await initPromise;
+      } finally {
+        initPromise = null;
+      }
+    };
+
     const openSelectedFullscreen = () => {
       const camera = selectedCamera;
       if (!camera) {
@@ -415,9 +439,14 @@ export function useLegacyCctvAddon(viewerRef: MutableRefObject<Viewer | null>) {
       const target = event.target as HTMLElement;
       const openTrigger = target.closest<HTMLElement>('[data-addon-open="cctv-monitor"]');
       if (openTrigger) {
-        if (!cameras.length || countriesSelect.value !== activeCountry) {
-          void loadCameras(true);
-        }
+        void ensureInitialized().then(() => {
+          if (!isMounted) {
+            return;
+          }
+          if (!cameras.length || countriesSelect.value !== activeCountry) {
+            void loadCameras(true);
+          }
+        });
       }
 
       const selectNode = target.closest<HTMLElement>('[data-cctv-select]');
@@ -476,9 +505,11 @@ export function useLegacyCctvAddon(viewerRef: MutableRefObject<Viewer | null>) {
     };
 
     const onRefresh = () => {
-      offset = 0;
-      void loadCameras(true);
-      void refreshSelectedCamera();
+      void ensureInitialized().then(() => {
+        offset = 0;
+        void loadCameras(true);
+        void refreshSelectedCamera();
+      });
     };
 
     const onResetFilters = () => {
@@ -488,12 +519,16 @@ export function useLegacyCctvAddon(viewerRef: MutableRefObject<Viewer | null>) {
       statusSelect.value = '';
       sortSelect.value = 'views';
       searchInput.value = '';
-      offset = 0;
-      void loadCameras(true);
+      void ensureInitialized().then(() => {
+        offset = 0;
+        void loadCameras(true);
+      });
     };
 
     const onLoadMore = () => {
-      void loadCameras(false);
+      void ensureInitialized().then(() => {
+        void loadCameras(false);
+      });
     };
 
     const onFullscreen = () => openSelectedFullscreen();
@@ -512,8 +547,11 @@ export function useLegacyCctvAddon(viewerRef: MutableRefObject<Viewer | null>) {
     openPlayerBtn.addEventListener('click', onOpenPlayer);
     document.addEventListener('click', onClick);
 
-    void loadCountries().then(() => loadCameras(true));
+    setStatus('Open CCTV monitor to load live feeds.');
     refreshTimer = window.setInterval(() => {
+      if (!isBootstrapped) {
+        return;
+      }
       void refreshSelectedCamera();
       void refreshVisibleCameraUrls();
     }, TOKEN_REFRESH_MS);

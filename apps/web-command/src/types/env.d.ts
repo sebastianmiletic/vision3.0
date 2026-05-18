@@ -19,6 +19,17 @@ interface Window {
   __applyPerformancePreset?: (preset: string) => void;
   __applyWorldTexturePreset?: (preset: string) => void;
   __prepareTilesForLocation?: (latitude: number, longitude: number) => Promise<void>;
+  __flyToOptimalLocationView?: (latitude: number, longitude: number, label?: string) => {
+    headingDegrees: number;
+    pitchDegrees: number;
+    rangeMeters: number;
+    targetLabel: string;
+  } | null;
+  __cycleCardinalView?: () => {
+    direction: 'north' | 'east' | 'south' | 'west';
+    nextDirection: 'north' | 'east' | 'south' | 'west';
+    targetLabel: string;
+  } | null;
   __setCameraFocusMode?: (mode: 'mouse' | 'crosshair') => void;
   __getCameraFocusMode?: () => 'mouse' | 'crosshair';
 }

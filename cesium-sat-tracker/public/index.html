@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cesium Satellite Tracker</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="viewerContainer"></div>
+
+      <aside class="ui-panel" aria-label="Satellite controls">
+        <h1>Cesium Sat Tracker</h1>
+
+        <div class="control-group">
+          <label for="groupSelect">Satellite group</label>
+          <select id="groupSelect">
+            <option value="active" selected>active</option>
+            <option value="starlink">starlink</option>
+            <option value="gps-ops">gps-ops</option>
+            <option value="weather">weather</option>
+          </select>
+        </div>
+
+        <div class="control-group row">
+          <label for="satLimit">Limit</label>
+          <select id="satLimit">
+            <option value="200" selected>200</option>
+            <option value="400">400</option>
+            <option value="800">800</option>
+            <option value="1200">1200</option>
+          </select>
+          <button id="loadGroupBtn" type="button">Load Group</button>
+        </div>
+
+        <div class="control-group row">
+          <button id="playPauseBtn" type="button">Pause</button>
+          <button id="orbitToggleBtn" type="button">Hide Orbits</button>
+        </div>
+
+        <div class="control-group">
+          <label>Simulation speed</label>
+          <div class="speed-buttons">
+            <button class="speed-btn active" data-speed="1" type="button">1x</button>
+            <button class="speed-btn" data-speed="10" type="button">10x</button>
+            <button class="speed-btn" data-speed="100" type="button">100x</button>
+            <button class="speed-btn" data-speed="1000" type="button">1000x</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="searchInput">Search satellite</label>
+          <input id="searchInput" type="text" placeholder="Type satellite name" />
+        </div>
+
+        <div class="status-row">
+          <span id="statusText">Loading...</span>
+        </div>
+
+        <div id="satelliteList" class="satellite-list" aria-label="Satellite list"></div>
+      </aside>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

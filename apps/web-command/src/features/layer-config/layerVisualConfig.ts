@@ -40,6 +40,58 @@ const DEFAULT_CONFIG: LayerVisualConfig = {
 
 const layerConfigStore = new Map<string, LayerVisualConfig>();
 
+const LAYER_CONFIG_STORAGE_KEY = 'vision.v3.layer-visual-config.v1';
+
+function canUseStorage() {
+  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+}
+
+function persistLayerConfigStore() {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  try {
+    const snapshot: Record<string, LayerVisualConfig> = {};
+    for (const [layer, config] of layerConfigStore.entries()) {
+      snapshot[layer] = config;
+    }
+    window.localStorage.setItem(LAYER_CONFIG_STORAGE_KEY, JSON.stringify(snapshot));
+  } catch {
+    // Best effort only.
+  }
+}
+
+function restoreLayerConfigStore() {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(LAYER_CONFIG_STORAGE_KEY);
+    if (!raw) {
+      return;
+    }
+
+    const parsed = JSON.parse(raw) as Record<string, Partial<LayerVisualConfig>>;
+    if (!parsed || typeof parsed !== 'object') {
+      return;
+    }
+
+    Object.entries(parsed).forEach(([layer, partial]) => {
+      if (!partial || typeof partial !== 'object') {
+        return;
+      }
+      const seeded = normalizeConfig({ ...seededConfigForLayer(layer.toLowerCase()), ...partial });
+      layerConfigStore.set(layer, seeded);
+    });
+  } catch {
+    // Ignore corrupted saved config.
+  }
+}
+
+restoreLayerConfigStore();
+
 function normalizeColor(color: string | undefined): string {
   if (!color) {
     return DEFAULT_CONFIG.color;
@@ -206,6 +258,7 @@ export function getLayerVisualConfig(layer: string): LayerVisualConfig {
 export function setLayerVisualConfig(layer: string, config: Partial<LayerVisualConfig>): LayerVisualConfig {
   const merged = normalizeConfig({ ...getLayerVisualConfig(layer), ...config });
   layerConfigStore.set(layer, merged);
+  persistLayerConfigStore();
   window.dispatchEvent(
     new CustomEvent('vision:layer-config-changed', {
       detail: {
@@ -225,4 +278,18 @@ export function getLayerVisualConfigSnapshot() {
   }
 
   return snapshot;
+}
+
+
+export function resetLayerVisualConfigStorage() {
+  layerConfigStore.clear();
+  if (!canUseStorage()) {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(LAYER_CONFIG_STORAGE_KEY);
+  } catch {
+    // Best effort only.
+  }
 }

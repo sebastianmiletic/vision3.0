@@ -1,12 +1,12 @@
 import { setText } from './domUi';
 
 export const WORLD_TEXTURE_FILTERS: Record<string, string> = {
-  'hyperreal-earth': 'contrast(1.08) saturate(1.12) brightness(1.02)',
+  'hyperreal-earth': 'contrast(1.04) saturate(1.04) brightness(1)',
   'true-color': 'none',
-  'space-night': 'brightness(0.18) contrast(1.46) saturate(0.06) grayscale(0.9)',
-  'geoint-high-contrast': 'contrast(1.2) saturate(0.96) brightness(1.02)',
-  'polar-clarity': 'saturate(0.82) brightness(1.08) contrast(1.06)',
-  'infrared-scout': 'sepia(0.3) saturate(1.2) hue-rotate(-20deg) contrast(1.16) brightness(0.98)',
+  'space-night': 'brightness(0.6) contrast(1.4) saturate(0.3)',
+  'geoint-high-contrast': 'contrast(1.1) saturate(1.02) brightness(0.97)',
+  'polar-clarity': 'contrast(1.08) saturate(0.9) brightness(1.01)',
+  'infrared-scout': 'sepia(0.12) saturate(1.06) hue-rotate(-10deg) contrast(1.08) brightness(0.95)',
 };
 
 const LAYER_GROUP_ORDER = [

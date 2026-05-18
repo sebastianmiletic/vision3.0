@@ -30,6 +30,12 @@ export const satelliteStateSchema = z.object({
   altitudeKm: z.number(),
   velocityKps: z.number(),
   sourceTimestamp: z.string(),
+  inclinationDeg: z.number().nullable().optional(),
+  rightAscensionDeg: z.number().nullable().optional(),
+  argumentPerigeeDeg: z.number().nullable().optional(),
+  meanAnomalyDeg: z.number().nullable().optional(),
+  meanMotionRevPerDay: z.number().nullable().optional(),
+  orbitalEpoch: z.string().nullable().optional(),
 });
 
 export const radarFrameSchema = z.object({

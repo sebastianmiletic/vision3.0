@@ -70,7 +70,8 @@ public class PollingOrchestrator {
   }
 
   private void publish(PollBatch<?> batch, Runnable ingestion) {
-    if (!"OK".equals(batch.status())) {
+    boolean publishableStatus = "OK".equals(batch.status()) || "OFFLINE_FALLBACK".equals(batch.status());
+    if (!publishableStatus || batch.records().isEmpty()) {
       return;
     }
 

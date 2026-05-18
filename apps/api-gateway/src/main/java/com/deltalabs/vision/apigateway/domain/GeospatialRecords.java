@@ -15,7 +15,9 @@ public final class GeospatialRecords {
   }
 
   public record SatelliteState(String id, int noradId, String name, double latitude, double longitude,
-                               double altitudeKm, double velocityKps, Instant sourceTimestamp) {
+                               double altitudeKm, double velocityKps, Instant sourceTimestamp,
+                               Double inclinationDeg, Double rightAscensionDeg, Double argumentPerigeeDeg,
+                               Double meanAnomalyDeg, Double meanMotionRevPerDay, Instant orbitalEpoch) {
   }
 
   public record RadarFrame(String id, Instant timestamp, String tilePath, int colorScheme, String source) {

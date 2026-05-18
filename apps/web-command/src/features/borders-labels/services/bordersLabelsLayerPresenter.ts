@@ -23,7 +23,8 @@ const PLACE_LABELS_SOURCE_ID = 'vision-place-labels-layer';
 const COUNTRY_BORDERS_URL = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_boundary_lines_land.geojson';
 const PLACE_LABELS_URL = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_populated_places_simple.geojson';
 const LABEL_MIN_DISTANCE = 0;
-const LABEL_MAX_DISTANCE = 22_000_000;
+const LABEL_MAX_DISTANCE = 1_000_000_000;
+const BORDER_MAX_DISTANCE = 1_000_000_000;
 
 type PlaceCandidate = {
   entity: Entity;
@@ -88,7 +89,7 @@ function applyBordersStyling(dataSource: GeoJsonDataSource) {
         outlineColor,
         outlineWidth: Math.max(1, width * 0.62),
       });
-      entity.polyline.distanceDisplayCondition = new DistanceDisplayCondition(0, 35_000_000);
+      entity.polyline.distanceDisplayCondition = new DistanceDisplayCondition(0, BORDER_MAX_DISTANCE);
       return;
     }
 
@@ -157,13 +158,13 @@ function applyPlaceLabelStyling(dataSource: GeoJsonDataSource): number {
 
 export async function ensureCountryBordersDataSource(viewer: Viewer): Promise<GeoJsonDataSource> {
   const existing = viewer.dataSources.getByName(COUNTRY_BORDERS_SOURCE_ID)[0];
-  if (existing instanceof GeoJsonDataSource) {
-    return existing;
+  if (existing) {
+    return existing as GeoJsonDataSource;
   }
 
   const dataSource = new GeoJsonDataSource(COUNTRY_BORDERS_SOURCE_ID);
   await dataSource.load(COUNTRY_BORDERS_URL, {
-    stroke: Color.fromCssColorString('#66d8ff').withAlpha(0.94),
+    stroke: Color.TRANSPARENT,
     strokeWidth: 2.1,
     clampToGround: true,
   });
@@ -173,8 +174,8 @@ export async function ensureCountryBordersDataSource(viewer: Viewer): Promise<Ge
 
 export async function ensurePlaceLabelsDataSource(viewer: Viewer): Promise<GeoJsonDataSource> {
   const existing = viewer.dataSources.getByName(PLACE_LABELS_SOURCE_ID)[0];
-  if (existing instanceof GeoJsonDataSource) {
-    return existing;
+  if (existing) {
+    return existing as GeoJsonDataSource;
   }
 
   const dataSource = new GeoJsonDataSource(PLACE_LABELS_SOURCE_ID);
@@ -190,17 +191,36 @@ export async function ensurePlaceLabelsDataSource(viewer: Viewer): Promise<GeoJs
 export async function applyBordersLabelsLayer(viewer: Viewer, enabled: boolean) {
   const bordersSource = await ensureCountryBordersDataSource(viewer);
   const labelsSource = await ensurePlaceLabelsDataSource(viewer);
+  const borderSources = viewer.dataSources.getByName(COUNTRY_BORDERS_SOURCE_ID);
+  const labelSources = viewer.dataSources.getByName(PLACE_LABELS_SOURCE_ID);
+  const config = getLayerVisualConfig(LAYER_KEY);
+  const bordersEnabled = enabled && config.outlineEnabled;
+  const labelsEnabled = enabled && config.showLabel;
 
-  bordersSource.show = enabled;
-  labelsSource.show = enabled;
+  borderSources.forEach((source) => {
+    source.show = bordersEnabled;
+  });
+  labelSources.forEach((source) => {
+    source.show = labelsEnabled;
+  });
 
   if (!enabled) {
     setBordersLabelsUiStatus('Natural Earth borders · disabled', 0);
+    viewer.scene.requestRender();
     return;
   }
 
-  applyBordersStyling(bordersSource);
-  const labelCount = applyPlaceLabelStyling(labelsSource);
+  if (bordersEnabled) {
+    applyBordersStyling(bordersSource);
+  }
+  const labelCount = labelsEnabled ? applyPlaceLabelStyling(labelsSource) : 0;
   const borderCount = bordersSource.entities.values.length;
-  setBordersLabelsUiStatus(`Natural Earth borders · ${borderCount} segments`, labelCount);
+  if (!bordersEnabled && !labelsEnabled) {
+    setBordersLabelsUiStatus('Natural Earth borders · hidden by config', 0);
+  } else if (!bordersEnabled) {
+    setBordersLabelsUiStatus('Natural Earth borders · off', labelCount);
+  } else {
+    setBordersLabelsUiStatus(`Natural Earth borders · ${borderCount} segments`, labelCount);
+  }
+  viewer.scene.requestRender();
 }

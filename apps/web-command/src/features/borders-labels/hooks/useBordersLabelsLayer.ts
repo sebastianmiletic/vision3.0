@@ -19,16 +19,15 @@ export function useBordersLabelsLayer(viewerRef: MutableRefObject<Viewer | null>
   useEffect(() => {
     let alive = true;
     let refreshInFlight = false;
+    let refreshPending = false;
 
-    async function refresh() {
-      if (!alive || refreshInFlight) {
+    async function runRefresh() {
+      if (!alive) {
         return;
       }
 
-      refreshInFlight = true;
       const viewer = viewerRef.current;
       if (!viewer) {
-        refreshInFlight = false;
         return;
       }
 
@@ -37,6 +36,24 @@ export function useBordersLabelsLayer(viewerRef: MutableRefObject<Viewer | null>
       } catch (error) {
         setBordersLabelsUiStatus('Natural Earth borders · waiting...', 0);
         console.error('Failed to load borders + labels layer', error);
+      }
+    }
+
+    async function refresh() {
+      if (!alive) {
+        return;
+      }
+      if (refreshInFlight) {
+        refreshPending = true;
+        return;
+      }
+
+      refreshInFlight = true;
+      try {
+        do {
+          refreshPending = false;
+          await runRefresh();
+        } while (alive && refreshPending);
       } finally {
         refreshInFlight = false;
       }

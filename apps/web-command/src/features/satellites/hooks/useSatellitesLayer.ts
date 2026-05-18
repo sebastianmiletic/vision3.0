@@ -28,21 +28,19 @@ export function useSatellitesLayer(viewerRef: MutableRefObject<Viewer | null>) {
   useEffect(() => {
     let alive = true;
     let refreshInFlight = false;
+    let refreshPending = false;
     let hasRenderedDataOnce = false;
     let lastRefreshAt = 0;
     let refreshQueuedTimer: number | null = null;
     let lastEnabledState: boolean | null = null;
     let startupSatellites = takeStartupSatellites();
 
-    async function refresh(force = false) {
-      if (refreshInFlight) {
+    async function runRefresh(force = false) {
+      if (!alive) {
         return;
       }
-
-      refreshInFlight = true;
       const viewer = viewerRef.current;
       if (!viewer) {
-        refreshInFlight = false;
         return;
       }
 
@@ -50,7 +48,6 @@ export function useSatellitesLayer(viewerRef: MutableRefObject<Viewer | null>) {
       const pollInterval = config.advancedSatellites ? ADVANCED_POLL_MS : STANDARD_POLL_MS;
       const now = Date.now();
       if (!force && now - lastRefreshAt < pollInterval) {
-        refreshInFlight = false;
         return;
       }
 
@@ -64,12 +61,10 @@ export function useSatellitesLayer(viewerRef: MutableRefObject<Viewer | null>) {
           }
           lastEnabledState = false;
           setSatelliteUiStatus('CelesTrak · disabled', 0);
-          refreshInFlight = false;
           return;
         }
 
         if (document.hidden) {
-          refreshInFlight = false;
           return;
         }
 
@@ -80,7 +75,6 @@ export function useSatellitesLayer(viewerRef: MutableRefObject<Viewer | null>) {
           : await fetchSatellites(config.advancedSatellites);
         startupSatellites = null;
         if (!alive) {
-          refreshInFlight = false;
           return;
         }
 
@@ -96,6 +90,26 @@ export function useSatellitesLayer(viewerRef: MutableRefObject<Viewer | null>) {
       } catch (error) {
         setSatelliteUiStatus('CelesTrak · waiting...', 0);
         console.error('Failed to load satellites layer', error);
+      }
+    }
+
+    async function refresh(force = false) {
+      if (!alive) {
+        return;
+      }
+      if (refreshInFlight) {
+        refreshPending = true;
+        return;
+      }
+
+      refreshInFlight = true;
+      try {
+        let passForce = force;
+        do {
+          refreshPending = false;
+          await runRefresh(passForce);
+          passForce = true;
+        } while (alive && refreshPending);
       } finally {
         refreshInFlight = false;
       }

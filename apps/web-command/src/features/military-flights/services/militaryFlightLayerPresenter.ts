@@ -30,8 +30,8 @@ import type { FlightTrack } from '@vision/shared-types';
 const LAYER_ID = 'vision-military-flights-layer';
 const SMOOTH_SECONDS = 10;
 const MAX_SMOOTH_DISTANCE_METERS = 900_000;
-const ICON_MAX_DISTANCE_METERS = 65_000_000;
-const LABEL_MAX_DISTANCE_METERS = 12_000_000;
+const ICON_MAX_DISTANCE_METERS = 1_000_000_000;
+const LABEL_MAX_DISTANCE_METERS = 1_000_000_000;
 
 type VisionEntity = Entity & { __visionVisualSig?: string };
 type TrackPoint = { time: JulianDate; position: Cartesian3; latitude: number; longitude: number; altitudeMeters: number };

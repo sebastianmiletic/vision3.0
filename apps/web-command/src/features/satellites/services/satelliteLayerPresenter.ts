@@ -1,4 +1,5 @@
 import {
+  ArcType,
   BillboardGraphics,
   Cartesian2,
   Cartesian3,
@@ -29,11 +30,23 @@ import type { SatelliteState } from '@vision/shared-types';
 const LAYER_ID = 'vision-satellites-layer';
 const SMOOTH_SECONDS = 20;
 const MAX_SMOOTH_DISTANCE_METERS = 4_000_000;
-const ICON_MAX_DISTANCE_METERS = 70_000_000;
-const LABEL_MAX_DISTANCE_METERS = 14_000_000;
+const ICON_MAX_DISTANCE_METERS = 1_000_000_000;
+const LABEL_MAX_DISTANCE_METERS = 1_000_000_000;
+const POLE_SAFETY_LATITUDE_DEGREES = 89.95;
+const EARTH_GRAVITATIONAL_PARAMETER_KM3_S2 = 398600.4418;
+const EARTH_EQUATORIAL_RADIUS_KM = 6378.137;
+const EARTH_ROTATION_RATE_RAD_S = 7.2921159e-5;
 
 type VisionEntity = Entity & { __visionVisualSig?: string };
 type TrackPoint = { time: JulianDate; position: Cartesian3; latitude: number; longitude: number; altitudeMeters: number };
+type OrbitalElements = {
+  inclinationDeg: number;
+  rightAscensionDeg: number;
+  argumentPerigeeDeg: number;
+  meanAnomalyDeg: number;
+  meanMotionRevPerDay: number;
+  orbitalEpochMs: number;
+};
 
 const historyBySatelliteId = new Map<string, TrackPoint[]>();
 
@@ -47,6 +60,12 @@ function createSatellitePropertyBag(satellite: SatelliteState) {
     latitude: satellite.latitude,
     longitude: satellite.longitude,
     sourceTimestamp: satellite.sourceTimestamp,
+    inclinationDeg: satellite.inclinationDeg,
+    rightAscensionDeg: satellite.rightAscensionDeg,
+    argumentPerigeeDeg: satellite.argumentPerigeeDeg,
+    meanAnomalyDeg: satellite.meanAnomalyDeg,
+    meanMotionRevPerDay: satellite.meanMotionRevPerDay,
+    orbitalEpoch: satellite.orbitalEpoch,
   });
 }
 
@@ -75,10 +94,139 @@ function destinationFrom(latDeg: number, lonDeg: number, headingDeg: number, dis
     Math.cos(angularDistance) - Math.sin(latRad) * Math.sin(nextLat),
   );
 
+  const rawLatitude = (nextLat * 180) / Math.PI;
+  const clampedLatitude = Math.max(-POLE_SAFETY_LATITUDE_DEGREES, Math.min(POLE_SAFETY_LATITUDE_DEGREES, rawLatitude));
   return {
-    latitude: (nextLat * 180) / Math.PI,
+    latitude: clampedLatitude,
     longitude: (nextLon * 180) / Math.PI,
   };
+}
+
+function isPoleSafeLatitude(latitude: number) {
+  return Number.isFinite(latitude) && Math.abs(latitude) <= POLE_SAFETY_LATITUDE_DEGREES;
+}
+
+function getOrbitalElements(satellite: SatelliteState): OrbitalElements | null {
+  const inclinationDeg = satellite.inclinationDeg;
+  const rightAscensionDeg = satellite.rightAscensionDeg;
+  const argumentPerigeeDeg = satellite.argumentPerigeeDeg;
+  const meanAnomalyDeg = satellite.meanAnomalyDeg;
+  const meanMotionRevPerDay = satellite.meanMotionRevPerDay;
+  const orbitalEpochRaw = satellite.orbitalEpoch ?? satellite.sourceTimestamp;
+  const orbitalEpochMs = Date.parse(orbitalEpochRaw);
+  if (!Number.isFinite(orbitalEpochMs)) {
+    return null;
+  }
+  if (!Number.isFinite(inclinationDeg)
+    || !Number.isFinite(rightAscensionDeg)
+    || !Number.isFinite(argumentPerigeeDeg)
+    || !Number.isFinite(meanAnomalyDeg)
+    || !Number.isFinite(meanMotionRevPerDay)
+    || meanMotionRevPerDay <= 0) {
+    return null;
+  }
+
+  return {
+    inclinationDeg,
+    rightAscensionDeg,
+    argumentPerigeeDeg,
+    meanAnomalyDeg,
+    meanMotionRevPerDay,
+    orbitalEpochMs,
+  };
+}
+
+function estimateOrbitalStateAtUnixSeconds(elements: OrbitalElements, unixSeconds: number) {
+  const dtSeconds = unixSeconds - (elements.orbitalEpochMs / 1000);
+  const meanMotionRadPerSecond = elements.meanMotionRevPerDay * 2 * Math.PI / 86400;
+  if (!Number.isFinite(meanMotionRadPerSecond) || meanMotionRadPerSecond <= 0) {
+    return null;
+  }
+
+  const semiMajorAxisKm = Math.cbrt(EARTH_GRAVITATIONAL_PARAMETER_KM3_S2 / (meanMotionRadPerSecond * meanMotionRadPerSecond));
+  if (!Number.isFinite(semiMajorAxisKm) || semiMajorAxisKm < EARTH_EQUATORIAL_RADIUS_KM) {
+    return null;
+  }
+
+  const inclination = (elements.inclinationDeg * Math.PI) / 180;
+  const rightAscension = (elements.rightAscensionDeg * Math.PI) / 180;
+  const argumentPerigee = (elements.argumentPerigeeDeg * Math.PI) / 180;
+  const meanAnomaly = ((elements.meanAnomalyDeg * Math.PI) / 180) + (meanMotionRadPerSecond * dtSeconds);
+  const argumentOfLatitude = meanAnomaly + argumentPerigee;
+
+  const cosO = Math.cos(rightAscension);
+  const sinO = Math.sin(rightAscension);
+  const cosI = Math.cos(inclination);
+  const sinI = Math.sin(inclination);
+  const cosU = Math.cos(argumentOfLatitude);
+  const sinU = Math.sin(argumentOfLatitude);
+
+  const xEci = semiMajorAxisKm * (cosO * cosU - sinO * sinU * cosI);
+  const yEci = semiMajorAxisKm * (sinO * cosU + cosO * sinU * cosI);
+  const zEci = semiMajorAxisKm * (sinU * sinI);
+
+  const earthRotation = EARTH_ROTATION_RATE_RAD_S * unixSeconds;
+  const cosTheta = Math.cos(earthRotation);
+  const sinTheta = Math.sin(earthRotation);
+  const xEcef = (cosTheta * xEci) + (sinTheta * yEci);
+  const yEcef = (-sinTheta * xEci) + (cosTheta * yEci);
+  const zEcef = zEci;
+
+  const radiusKm = Math.sqrt((xEcef * xEcef) + (yEcef * yEcef) + (zEcef * zEcef));
+  if (!Number.isFinite(radiusKm) || radiusKm <= 0) {
+    return null;
+  }
+
+  const latitude = (Math.atan2(zEcef, Math.sqrt((xEcef * xEcef) + (yEcef * yEcef))) * 180) / Math.PI;
+  const longitude = (Math.atan2(yEcef, xEcef) * 180) / Math.PI;
+  const altitudeKm = Math.max(radiusKm - EARTH_EQUATORIAL_RADIUS_KM, 1);
+
+  if (!isValidCoordinates(latitude, longitude)) {
+    return null;
+  }
+
+  return {
+    latitude,
+    longitude,
+    altitudeMeters: altitudeKm * 1000,
+  };
+}
+
+function buildOrbitalTrackPositions(
+  satellite: SatelliteState,
+  mode: 'orbit' | 'path',
+  pathLeadMinutes: number,
+) {
+  const elements = getOrbitalElements(satellite);
+  if (!elements) {
+    return null;
+  }
+
+  const periodSeconds = Math.max(60, 86400 / elements.meanMotionRevPerDay);
+  const nowSeconds = Date.now() / 1000;
+  const spanSeconds = mode === 'orbit'
+    ? Math.min(periodSeconds, 4 * 3600)
+    : Math.max(60, pathLeadMinutes * 60);
+  const startSeconds = mode === 'orbit'
+    ? nowSeconds - (spanSeconds / 2)
+    : nowSeconds;
+  const endSeconds = mode === 'orbit'
+    ? nowSeconds + (spanSeconds / 2)
+    : nowSeconds + spanSeconds;
+  const sampleCount = mode === 'orbit' ? 128 : 48;
+  const positions: Cartesian3[] = [];
+
+  for (let index = 0; index < sampleCount; index += 1) {
+    const mix = sampleCount <= 1 ? 0 : (index / (sampleCount - 1));
+    const sampleSeconds = startSeconds + ((endSeconds - startSeconds) * mix);
+    const state = estimateOrbitalStateAtUnixSeconds(elements, sampleSeconds);
+    if (!state) {
+      continue;
+    }
+    positions.push(Cartesian3.fromDegrees(state.longitude, state.latitude, state.altitudeMeters));
+  }
+
+  return positions.length >= 2 ? positions : null;
 }
 
 function bearingBetween(fromLat: number, fromLon: number, toLat: number, toLon: number) {
@@ -141,16 +289,25 @@ function applyPosition(entity: Entity, satellite: SatelliteState) {
   if (showPredictive) {
     const leadMinutes = config.showOrbit ? config.orbitMinutes : config.pathLeadMinutes;
     const leadSeconds = leadMinutes * 60;
-    const speedMetersPerSecond = Math.max((satellite.velocityKps || 0) * 1000, 0);
-    const distanceMeters = speedMetersPerSecond * leadSeconds;
-    const previousPoint = pruned.length > 1 ? pruned[pruned.length - 2] : undefined;
-    const heading = previousPoint
-      ? bearingBetween(previousPoint.latitude, previousPoint.longitude, satellite.latitude, satellite.longitude)
-      : 90;
-    const projected = destinationFrom(satellite.latitude, satellite.longitude, heading, distanceMeters);
-    if (isValidCoordinates(projected.latitude, projected.longitude)) {
-      const projectedPosition = Cartesian3.fromDegrees(projected.longitude, projected.latitude, altitudeMeters);
-      sampled.addSample(JulianDate.addSeconds(now, leadSeconds, new JulianDate()), projectedPosition);
+    const elements = getOrbitalElements(satellite);
+    if (elements) {
+      const state = estimateOrbitalStateAtUnixSeconds(elements, (Date.now() / 1000) + leadSeconds);
+      if (state && isValidCoordinates(state.latitude, state.longitude)) {
+        const projectedPosition = Cartesian3.fromDegrees(state.longitude, state.latitude, state.altitudeMeters);
+        sampled.addSample(JulianDate.addSeconds(now, leadSeconds, new JulianDate()), projectedPosition);
+      }
+    } else {
+      const speedMetersPerSecond = Math.max((satellite.velocityKps || 0) * 1000, 0);
+      const distanceMeters = speedMetersPerSecond * leadSeconds;
+      const previousPoint = pruned.length > 1 ? pruned[pruned.length - 2] : undefined;
+      const heading = previousPoint
+        ? bearingBetween(previousPoint.latitude, previousPoint.longitude, satellite.latitude, satellite.longitude)
+        : 90;
+      const projected = destinationFrom(satellite.latitude, satellite.longitude, heading, distanceMeters);
+      if (isValidCoordinates(projected.latitude, projected.longitude)) {
+        const projectedPosition = Cartesian3.fromDegrees(projected.longitude, projected.latitude, altitudeMeters);
+        sampled.addSample(JulianDate.addSeconds(now, leadSeconds, new JulianDate()), projectedPosition);
+      }
     }
   }
 
@@ -212,21 +369,34 @@ function applyVisuals(entity: Entity, satellite: SatelliteState) {
   const leadSeconds = config.showOrbit
     ? config.orbitMinutes * 60
     : config.showPath ? config.pathLeadMinutes * 60 : 0;
+  const orbitPolylinePositions = config.showOrbit
+    ? buildOrbitalTrackPositions(satellite, 'orbit', config.pathLeadMinutes)
+    : config.showPath
+      ? buildOrbitalTrackPositions(satellite, 'path', config.pathLeadMinutes)
+      : null;
 
-  if (trailSeconds > 0 || leadSeconds > 0) {
-    entity.path = new PathGraphics({
+  if ((trailSeconds > 0 || leadSeconds > 0) && !orbitPolylinePositions) {
+    entity.path = isPoleSafeLatitude(satellite.latitude) ? new PathGraphics({
       width: Math.max(1, config.outlineWidth + 1),
       leadTime: leadSeconds,
       trailTime: trailSeconds,
       resolution: 10,
       material: new ColorMaterialProperty(buildCesiumColor(config.color, Math.min(0.66, config.markerOpacity))),
       distanceDisplayCondition: new DistanceDisplayCondition(0, ICON_MAX_DISTANCE_METERS),
-    });
+    }) : undefined;
   } else {
     entity.path = undefined;
   }
 
-  if (config.showOrbit || config.showPath) {
+  if (orbitPolylinePositions) {
+    entity.polyline = new PolylineGraphics({
+      positions: orbitPolylinePositions,
+      width: Math.max(1, config.outlineWidth + 1),
+      arcType: ArcType.NONE,
+      material: new ColorMaterialProperty(buildCesiumColor(config.color, 0.42)),
+      distanceDisplayCondition: new DistanceDisplayCondition(0, ICON_MAX_DISTANCE_METERS),
+    });
+  } else if (config.showOrbit || config.showPath) {
     const history = historyBySatelliteId.get(satellite.id) ?? [];
     const started = history[0];
     const previousPoint = history.length > 1 ? history[history.length - 2] : undefined;
@@ -243,12 +413,20 @@ function applyVisuals(entity: Entity, satellite: SatelliteState) {
         : Cartesian3.fromDegrees(satellite.longitude, satellite.latitude, altitudeMeters);
       const currentPosition = Cartesian3.fromDegrees(satellite.longitude, satellite.latitude, altitudeMeters);
       const projectedPosition = Cartesian3.fromDegrees(projected.longitude, projected.latitude, altitudeMeters);
-      entity.polyline = new PolylineGraphics({
-        positions: [startPosition, currentPosition, projectedPosition],
-        width: Math.max(1, config.outlineWidth + 1),
-        material: new ColorMaterialProperty(buildCesiumColor(config.color, 0.42)),
-        distanceDisplayCondition: new DistanceDisplayCondition(0, ICON_MAX_DISTANCE_METERS),
-      });
+      const poleSafeSegment = isPoleSafeLatitude(satellite.latitude)
+        && isPoleSafeLatitude(projected.latitude)
+        && (!started || isPoleSafeLatitude(started.latitude));
+      entity.polyline = poleSafeSegment
+        ? new PolylineGraphics({
+            positions: [startPosition, currentPosition, projectedPosition],
+            width: Math.max(1, config.outlineWidth + 1),
+            arcType: ArcType.NONE,
+            material: new ColorMaterialProperty(buildCesiumColor(config.color, 0.42)),
+            distanceDisplayCondition: new DistanceDisplayCondition(0, ICON_MAX_DISTANCE_METERS),
+          })
+        : undefined;
+    } else {
+      entity.polyline = undefined;
     }
   } else {
     entity.polyline = undefined;

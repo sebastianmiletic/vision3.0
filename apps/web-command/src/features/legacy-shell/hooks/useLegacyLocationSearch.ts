@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
 import {
   BillboardGraphics,
-  BoundingSphere,
   Cartesian2,
   Cartesian3,
   ConstantPositionProperty,
   Cartographic,
   Color,
-  HeadingPitchRange,
   HeightReference,
   LabelGraphics,
   LabelStyle,
@@ -108,17 +106,16 @@ function addOrUpdateSearchPin(viewer: Viewer, label: string, latitude: number, l
   });
 }
 
-function flyToLandmarkPerspective(viewer: Viewer, latitude: number, longitude: number) {
-  const target = Cartesian3.fromDegrees(longitude, latitude, 0);
-  const sphere = new BoundingSphere(target, 140);
+function flyToFallbackPerspective(viewer: Viewer, latitude: number, longitude: number) {
   viewer.trackedEntity = undefined;
-  viewer.camera.flyToBoundingSphere(sphere, {
-    duration: 2.6,
-    offset: new HeadingPitchRange(
-      CesiumMath.toRadians(36),
-      CesiumMath.toRadians(-29),
-      2400,
-    ),
+  viewer.camera.flyTo({
+    destination: Cartesian3.fromDegrees(longitude, latitude, 1900),
+    orientation: {
+      heading: CesiumMath.toRadians(35),
+      pitch: CesiumMath.toRadians(-22),
+      roll: 0,
+    },
+    duration: 2.4,
   });
 }
 
@@ -142,6 +139,8 @@ export function useLegacyLocationSearch(viewerRef: MutableRefObject<Viewer | nul
       return;
     }
 
+    let searchInFlight = false;
+
     const onLocationKeydown = async (event: KeyboardEvent) => {
       if (event.key !== 'Enter') {
         return;
@@ -154,24 +153,51 @@ export function useLegacyLocationSearch(viewerRef: MutableRefObject<Viewer | nul
         return;
       }
 
-      setText('searchStatus', 'Resolving location...');
-      const result = await resolveSearchQuery(query);
-      if (!result) {
-        setText('searchStatus', 'Location not found. Try a clearer place name.');
+      if (searchInFlight) {
+        setText('searchStatus', 'Search in progress...');
         return;
       }
 
-      const { label, latitude, longitude } = result;
-      addOrUpdateSearchPin(viewer, label, latitude, longitude);
-      updateLocationInspectorFields(label, latitude, longitude);
+      searchInFlight = true;
+      locationSearch.setAttribute('aria-busy', 'true');
+      setText('searchStatus', 'Thinking...');
 
-      flyToLandmarkPerspective(viewer, latitude, longitude);
-      window.dispatchEvent(new CustomEvent('vision:location-search-resolved', {
-        detail: { label, latitude, longitude },
-      }));
+      try {
+        const result = await resolveSearchQuery(query);
+        if (!result) {
+          setText('searchStatus', 'Location not found. Try a clearer place name.');
+          return;
+        }
 
-      setText('searchStatus', `${label} · ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-      setText('keyLocationInspectStatus', `Inspected: ${label}`);
+        const { label, latitude, longitude } = result;
+        addOrUpdateSearchPin(viewer, label, latitude, longitude);
+        updateLocationInspectorFields(label, latitude, longitude);
+
+        setText('searchStatus', `Preloading 3D photorealistic tiles for ${label}...`);
+        await window.__prepareTilesForLocation?.(latitude, longitude);
+
+        setText('searchStatus', `Navigating to ${label}...`);
+        const optimalView = window.__flyToOptimalLocationView?.(latitude, longitude, label);
+        if (!optimalView) {
+          flyToFallbackPerspective(viewer, latitude, longitude);
+        }
+        window.dispatchEvent(new CustomEvent('vision:location-search-resolved', {
+          detail: { label, latitude, longitude },
+        }));
+
+        if (optimalView) {
+          setText(
+            'searchStatus',
+            `${label} · ${latitude.toFixed(5)}, ${longitude.toFixed(5)} · VIEW ${Math.round(optimalView.headingDegrees)}° / ${Math.round(optimalView.pitchDegrees)}°`,
+          );
+        } else {
+          setText('searchStatus', `${label} · ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+        }
+        setText('keyLocationInspectStatus', `Inspected: ${label}`);
+      } finally {
+        searchInFlight = false;
+        locationSearch.removeAttribute('aria-busy');
+      }
     };
 
     locationSearch.addEventListener('keydown', onLocationKeydown);

@@ -25,20 +25,18 @@ export function useFlightsLayer(viewerRef: MutableRefObject<Viewer | null>) {
   useEffect(() => {
     let alive = true;
     let refreshInFlight = false;
+    let refreshPending = false;
     let hasRenderedOnce = false;
     let refreshQueuedTimer: number | null = null;
     let lastEnabledState: boolean | null = null;
     let startupFlights = takeStartupFlights();
 
-    async function refresh() {
-      if (refreshInFlight) {
+    async function runRefresh() {
+      if (!alive) {
         return;
       }
-
-      refreshInFlight = true;
       const viewer = viewerRef.current;
       if (!viewer) {
-        refreshInFlight = false;
         return;
       }
 
@@ -52,19 +50,16 @@ export function useFlightsLayer(viewerRef: MutableRefObject<Viewer | null>) {
           }
           lastEnabledState = false;
           setFlightUiStatus('OpenSky network · disabled', 0);
-          refreshInFlight = false;
           return;
         }
 
         if (document.hidden) {
-          refreshInFlight = false;
           return;
         }
 
         const flights = startupFlights ?? await fetchFlights();
         startupFlights = null;
         if (!alive) {
-          refreshInFlight = false;
           return;
         }
 
@@ -74,6 +69,24 @@ export function useFlightsLayer(viewerRef: MutableRefObject<Viewer | null>) {
       } catch (error) {
         setFlightUiStatus('OpenSky network · waiting...', 0);
         console.error('Failed to load flights layer', error);
+      }
+    }
+
+    async function refresh() {
+      if (!alive) {
+        return;
+      }
+      if (refreshInFlight) {
+        refreshPending = true;
+        return;
+      }
+
+      refreshInFlight = true;
+      try {
+        do {
+          refreshPending = false;
+          await runRefresh();
+        } while (alive && refreshPending);
       } finally {
         refreshInFlight = false;
       }
